@@ -2,7 +2,7 @@
 
 {% block title %}
 
-SGE - Marcas
+SGE - Categorias
 
 {%endblock%}
 
@@ -10,7 +10,7 @@ SGE - Marcas
 
 <div class="row mb-3">
     <div class="col-md-6">
-        <form method="get" action="{% url 'brand_list' %}">
+        <form method="get" action="{% url 'category_list' %}">
             <div class="input-group">
                 <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}"> 
                 <button type="submit" class="btn btn-primary">
@@ -20,8 +20,8 @@ SGE - Marcas
         </form>
     </div>
     <div class="col-md-6">
-        <a href="{% url 'brand_create' %}" class="btn btn-success float-end">
-            <i class="bi bi-plus">Nova Marca</i>
+        <a href="{% url 'category_create' %}" class="btn btn-success float-end">
+            <i class="bi bi-plus">Nova Categoria</i>
         </a>
     </div>
 </div>
@@ -37,19 +37,19 @@ SGE - Marcas
             </tr>
         </thead>
         <tbody>
-            {% for brand in brands %}
+            {% for category in categories %}
             <tr>
-                <td>{{brand.id}}</td>
-                <td>{{brand.name}}</td>
-                <td>{{brand.description}}</td>
+                <td>{{category.id}}</td>
+                <td>{{category.name}}</td>
+                <td>{{category.description}}</td>
                 <td>
-                    <a href="{% url 'brand_detail' brand.id %}" class="btn btn-info btn-sm">
+                    <a href="{% url 'category_detail' category.id %}" class="btn btn-info btn-sm">
                         <i class="bi bi-eye"></i>
                     </a>
-                    <a href="{% url 'brand_update' brand.id %}" class="btn btn-warning btn-sm">
+                    <a href="{% url 'category_update' category.id %}" class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="{% url 'brand_delete' brand.id %}" class="btn btn-danger btn-sm">
+                    <a href="{% url 'category_delete' category.id %}" class="btn btn-danger btn-sm">
                         <i class="bi bi-trash"></i>
                     </a>
                 </td>
