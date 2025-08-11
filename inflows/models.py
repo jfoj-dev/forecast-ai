@@ -2,7 +2,7 @@ from django.db import models
 from products.models import Product
 from suppliers.models import Supplier
 
-class inflow(models.Model):
+class Inflow(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, related_name='inflows')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='inflows')
     quantity = models.IntegerField()
