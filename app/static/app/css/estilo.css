@@ -1,0 +1,69 @@
+.sidebar {
+  height: 100vh;          /* Altura total da tela */
+  width: 220px;           /* Largura da barra */
+  position: fixed;        /* Fixa na lateral */
+  top: 0;
+  left: 0;
+  background-color: #116c68; /* Cor de fundo */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar a {
+  padding: 15px 20px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #f1f1f1;
+  display: block;
+  transition: 0.3s;
+}
+
+/* Efeito hover nos links */
+.sidebar a:hover {
+  background-color: #575757;
+  color: white;
+}
+
+/* Conteúdo principal */
+.content {
+  margin-left: 250px;    /* Espaço para a sidebar */
+  padding: 20px;
+}
+
+/* Container da logo */
+.sidebar .logo {
+    width: 100%;
+    display: flex;               /* ativa flexbox */
+    justify-content: center;     /* centraliza horizontalmente */
+    align-items: center;         /* centraliza verticalmente (se tiver altura definida) */
+    flex-direction: column;      /* mantém imagem e texto em coluna */
+    padding: 0;             /* espaçamento acima e abaixo */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Imagem da logo */
+.sidebar .logo img {
+    width: 220px;
+    height: auto;
+    border-radius: 10px; /* se quiser cantos arredondados */
+}
+
+/* Texto da logo */
+.sidebar .logo h5 {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;       /* branco para contraste no fundo escuro */
+}
+
+/* Hover opcional: aumenta ligeiramente a logo */
+.sidebar .logo img:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+
+
+
+

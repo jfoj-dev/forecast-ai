@@ -13,14 +13,14 @@ SGE - Marcas
         <form method="get" action="{% url 'brand_list' %}">
             <div class="input-group">
                 <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}"> 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-dark">
                     <i class="bi bi-search"></i>
                 </button>
             </div>
         </form>
     </div>
     <div class="col-md-6">
-        <a href="{% url 'brand_create' %}" class="btn btn-success float-end">
+        <a href="{% url 'brand_create' %}" class="btn btn-dark float-end">
             <i class="bi bi-plus">Nova Marca</i>
         </a>
     </div>
@@ -43,10 +43,10 @@ SGE - Marcas
                 <td>{{brand.name}}</td>
                 <td>{{brand.description}}</td>
                 <td>
-                    <a href="{% url 'brand_detail' brand.id %}" class="btn btn-info btn-sm">
+                    <a href="{% url 'brand_detail' brand.id %}" class="btn btn-dark btn-sm">
                         <i class="bi bi-eye"></i>
                     </a>
-                    <a href="{% url 'brand_update' brand.id %}" class="btn btn-warning btn-sm">
+                    <a href="{% url 'brand_update' brand.id %}" class="btn btn-dark btn-sm">
                         <i class="bi bi-pencil"></i>
                     </a>
                     <a href="{% url 'brand_delete' brand.id %}" class="btn btn-danger btn-sm">

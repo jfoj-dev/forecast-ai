@@ -13,14 +13,14 @@ SGE - Entradas
         <form method="get" action="{% url 'inflow_list' %}">
             <div class="input-group">
                 <input type="text" class="form-control" name="product" placeholder="Nome" value="{{ request.GET.product }}"> 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-dark">
                     <i class="bi bi-search"></i>
                 </button>
             </div>
         </form>
     </div>
     <div class="col-md-6">
-        <a href="{% url 'inflow_create' %}" class="btn btn-success float-end">
+        <a href="{% url 'inflow_create' %}" class="btn btn-dark float-end">
             <i class="bi bi-plus">Nova Entrada</i>
         </a>
     </div>

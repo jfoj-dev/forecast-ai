@@ -13,14 +13,14 @@ SGE - Categorias
         <form method="get" action="{% url 'category_list' %}">
             <div class="input-group">
                 <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}"> 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-dark">
                     <i class="bi bi-search"></i>
                 </button>
             </div>
         </form>
     </div>
     <div class="col-md-6">
-        <a href="{% url 'category_create' %}" class="btn btn-success float-end">
+        <a href="{% url 'category_create' %}" class="btn btn-dark float-end">
             <i class="bi bi-plus">Nova Categoria</i>
         </a>
     </div>
