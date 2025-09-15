@@ -1,11 +1,15 @@
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from . import models, forms
+from django.contrib import messages
+from django.db.models.deletion import ProtectedError
+from django.shortcuts import redirect
+from products.models import Product
 from categories.models import Category
 from brands.models import Brands
+from . import forms
 
 class ProductListView(ListView):
-    model = models.Product
+    model = Product
     template_name = 'product_list.html'
     context_object_name = 'products'
     paginate_by = 10
@@ -37,28 +41,43 @@ class ProductListView(ListView):
         context['brands'] = Brands.objects.all()
         return context
 
+
 class ProductCreateView(CreateView):
-    model = models.Product
+    model = Product
     template_name = 'product_create.html'
     form_class = forms.ProductForm
     success_url = reverse_lazy('product_list')
 
+
 class ProductDetailView(DetailView):
-    model = models.Product
+    model = Product
     template_name = 'product_detail.html'
 
+
 class ProductUpdateView(UpdateView):
-    model = models.Product
+    model = Product
     template_name = 'product_update.html'
     form_class = forms.ProductForm
     success_url = reverse_lazy('product_list')
 
+
 class ProductDeleteView(DeleteView):
-    model = models.Product
+    model = Product
     template_name = 'product_delete.html'
     success_url = reverse_lazy('product_list')
 
-
-
-
-
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+            messages.success(
+                request,
+                f'O produto "{self.object.title}" foi excluído com sucesso!'
+            )
+            return redirect(self.success_url)
+        except ProtectedError:
+            messages.error(
+                request,
+                f'Não é possível excluir o produto "{self.object.title}" pois ele está vinculado a algum evento ou registro.'
+            )
+            return redirect(self.success_url)

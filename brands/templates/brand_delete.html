@@ -7,14 +7,41 @@
 
   <div class="card"> 
     <div class="card-body">
-      <p class="card-text">Tem certeza que deseja excluir essa marca <strong>{{ object.name }}</strong></p>
-      <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Deletar</button>
-      </form>  
+      <p class="card-text">
+        Clique em "Deletar" para remover a marca <strong>{{ object.name }}</strong>
+      </p>
+      <!-- Botão que abre o modal -->
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+        Deletar
+      </button>
+      <a href="{% url 'brand_list' %}" class="btn btn-secondary">Cancelar</a>
     </div>
   </div>
-<a href="{% url 'brand_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para a Lista de Marcas</a>
 </div>
 
-{%endblock%}
+<!-- Modal de confirmação -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel">Confirmação de Exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Tem certeza que deseja excluir a marca 
+          <strong class="text-danger">{{ object.name }}</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Sim, deletar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
