@@ -7,4 +7,5 @@ urlpatterns = [
     path('brands/<int:pk>/detail', views.BrandDetailView.as_view(), name='brand_detail'),
     path('brands/<int:pk>/update', views.BrandUpdateView.as_view(), name='brand_update'),
     path('brands/<int:pk>/delete', views.BrandDeleteView.as_view(), name='brand_delete'),
+    path('brands/bulk-delete/', views.brand_bulk_delete, name='brand_bulk_delete'),  # ✅ exclusão em massa
 ]

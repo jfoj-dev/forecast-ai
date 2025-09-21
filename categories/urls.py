@@ -7,4 +7,5 @@ urlpatterns = [
     path('categories/<int:pk>/detail', views.CategoryDetailView.as_view(), name='category_detail'),
     path('categories/<int:pk>/update', views.CategoryUpdateView.as_view(), name='category_update'),
     path('categories/<int:pk>/delete', views.CategoryDeleteView.as_view(), name='category_delete'),
+    path('categories/bulk-delete/', views.category_bulk_delete, name='category_bulk_delete'),
 ]

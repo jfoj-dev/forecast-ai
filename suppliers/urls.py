@@ -7,4 +7,7 @@ urlpatterns = [
     path('suppliers/<int:pk>/detail', views.SupplierDetailView.as_view(), name='supplier_detail'),
     path('suppliers/<int:pk>/update', views.SupplierUpdateView.as_view(), name='supplier_update'),
     path('suppliers/<int:pk>/delete', views.SupplierDeleteView.as_view(), name='supplier_delete'),
+
+    # Rota para exclusão em massa
+    path('suppliers/bulk-delete/', views.supplier_bulk_delete, name='supplier_bulk_delete'),
 ]

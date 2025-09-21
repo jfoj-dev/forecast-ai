@@ -3,7 +3,10 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
 from . import models, forms
+
 
 class BrandListView(ListView):
     model = models.Brands
@@ -58,3 +61,35 @@ class BrandDeleteView(DeleteView):
                 f'Não é possível excluir a marca "{self.object.name}" pois ela está vinculada a um evento/produto.'
             )
             return redirect(self.success_url)
+
+
+# Função para exclusão em massa de marcas
+@require_POST
+def brand_bulk_delete(request):
+    selected_ids = request.POST.getlist('selected_brands')
+    if not selected_ids:
+        messages.warning(request, "Nenhuma marca foi selecionada para exclusão.")
+        return redirect('brand_list')
+
+    failed = []
+    deleted_count = 0
+
+    for brand_id in selected_ids:
+        try:
+            brand = models.Brands.objects.get(id=brand_id)
+            brand.delete()
+            deleted_count += 1
+        except ProtectedError:
+            failed.append(brand.name)
+        except models.Brands.DoesNotExist:
+            continue
+
+    if deleted_count > 0:
+        messages.success(request, f"{deleted_count} marca(s) excluída(s) com sucesso!")
+    if failed:
+        messages.error(
+            request,
+            f"Não foi possível excluir as seguintes marcas pois estão vinculadas: {', '.join(failed)}"
+        )
+
+    return redirect('brand_list')

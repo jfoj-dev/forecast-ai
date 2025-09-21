@@ -3,7 +3,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
 from . import models, forms
+
 
 class CategoryListView(ListView):
     model = models.Category
@@ -55,6 +57,38 @@ class CategoryDeleteView(DeleteView):
         except ProtectedError:
             messages.error(
                 request,
-                f'Não é possível excluir a categoria "{self.object.name}" pois ela está vinculada a algum produto/evento.'
+                f'Não é possível excluir a categoria "{self.object.name}" pois está vinculada a algum produto/evento.'
             )
             return redirect(self.success_url)
+
+
+# Exclusão em massa de categorias
+@require_POST
+def category_bulk_delete(request):
+    selected_ids = request.POST.getlist('selected_categories')
+    if not selected_ids:
+        messages.warning(request, "Nenhuma categoria foi selecionada para exclusão.")
+        return redirect('category_list')
+
+    deleted_count = 0
+    failed = []
+
+    for category_id in selected_ids:
+        try:
+            category = models.Category.objects.get(id=category_id)
+            category.delete()  # <- Corrigido: chamar método delete()
+            deleted_count += 1
+        except ProtectedError:
+            failed.append(category.name)
+        except models.Category.DoesNotExist:
+            continue
+
+    if deleted_count:
+        messages.success(request, f"{deleted_count} categoria(s) excluída(s) com sucesso.")
+    if failed:
+        messages.error(
+            request,
+            f"Não foi possível excluir as categorias: {', '.join(failed)} pois estão vinculadas a produtos/eventos."
+        )
+
+    return redirect('category_list')

@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
 from . import models, forms
 
 
@@ -61,3 +62,38 @@ class SupplierDeleteView(DeleteView):
                 f'Não é possível excluir o fornecedor "{self.object.name}" pois ele está sendo utilizado em um evento.'
             )
             return redirect(self.success_url)
+
+
+# ===============================================
+# VIEW PARA EXCLUSÃO EM MASSA
+# ===============================================
+@require_POST
+def supplier_bulk_delete(request):
+    ids = request.POST.getlist('selected_suppliers')  # IDs selecionados na checkbox
+    if not ids:
+        messages.warning(request, 'Nenhum fornecedor foi selecionado para exclusão.')
+        return redirect('supplier_list')
+
+    suppliers = models.Supplier.objects.filter(id__in=ids)
+    deleted = []
+    protected = []
+
+    for supplier in suppliers:
+        try:
+            supplier.delete()
+            deleted.append(supplier.name)
+        except ProtectedError:
+            protected.append(supplier.name)
+
+    if deleted:
+        messages.success(
+            request,
+            f'Fornecedores excluídos com sucesso: {", ".join(deleted)}.'
+        )
+    if protected:
+        messages.error(
+            request,
+            f'Não foi possível excluir os fornecedores: {", ".join(protected)} pois estão sendo utilizados em algum evento.'
+        )
+
+    return redirect('supplier_list')

@@ -5,10 +5,10 @@
 <div class="container mt-4">
   <h3 class="display-6">Deletar Categoria</h3>
 
-  <div class="card"> 
+  <div class="card shadow-sm"> 
     <div class="card-body">
       <p class="card-text">
-        Clique em "Deletar" para remover a categoria <strong>{{ object.name }}</strong>
+        Você está prestes a remover a categoria <strong>{{ object.name }}</strong>.
       </p>
       <!-- Botão que abre o modal -->
       <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
@@ -23,15 +23,16 @@
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header bg-danger text-white">
         <h5 class="modal-title" id="confirmDeleteLabel">Confirmação de Exclusão</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
       <div class="modal-body">
         <p>
           Tem certeza que deseja excluir a categoria 
           <strong class="text-danger">{{ object.name }}</strong>?
         </p>
+        <p class="text-muted small">Essa ação não pode ser desfeita.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
