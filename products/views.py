@@ -3,11 +3,12 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
-from products.models import Product
+from .models import Product
 from categories.models import Category
 from brands.models import Brands
 from . import forms
 
+# -------------------- LISTAGEM --------------------
 class ProductListView(ListView):
     model = Product
     template_name = 'product_list.html'
@@ -37,22 +38,43 @@ class ProductListView(ListView):
         context['brands'] = Brands.objects.all()
         return context
 
+# -------------------- CRIAÇÃO --------------------
 class ProductCreateView(CreateView):
     model = Product
     template_name = 'product_create.html'
     form_class = forms.ProductForm
     success_url = reverse_lazy('product_list')
 
+    def form_valid(self, form):
+        # Ao criar, last_cost_price recebe o valor inicial de cost_price
+        form.instance.last_cost_price = form.cleaned_data['cost_price']
+        return super().form_valid(form)
+
+# -------------------- DETALHE --------------------
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'product_detail.html'
 
+# -------------------- ATUALIZAÇÃO --------------------
 class ProductUpdateView(UpdateView):
     model = Product
     template_name = 'product_update.html'
     form_class = forms.ProductForm
     success_url = reverse_lazy('product_list')
 
+    def form_valid(self, form):
+        # Se o checkbox update_cost estiver marcado
+        if self.request.POST.get('update_cost'):
+            # Atualiza last_cost_price com o valor antigo
+            form.instance.last_cost_price = form.instance.cost_price
+            # cost_price será atualizado com o valor enviado no form
+            return super().form_valid(form)
+        else:
+            # Mantém o custo atual sem alterações
+            form.instance.cost_price = form.instance.cost_price
+            return super().form_valid(form)
+
+# -------------------- EXCLUSÃO --------------------
 class ProductDeleteView(DeleteView):
     model = Product
     template_name = 'product_delete.html'
@@ -70,11 +92,11 @@ class ProductDeleteView(DeleteView):
         except ProtectedError:
             messages.error(
                 request,
-                f'Não é possível excluir o produto "{self.object.title}" pois ele está vinculado a algum evento ou registro.'
+                f'Não é possível excluir o produto "{self.object.title}" pois está vinculado a algum registro.'
             )
             return redirect(self.success_url)
 
-# --- Exclusão em massa ---
+# -------------------- EXCLUSÃO EM MASSA --------------------
 class ProductBulkDeleteView(View):
     def post(self, request, *args, **kwargs):
         selected_ids = request.POST.getlist('selected_products')

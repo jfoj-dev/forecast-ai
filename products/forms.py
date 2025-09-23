@@ -2,10 +2,17 @@ from django import forms
 from . import models
 
 class ProductForm(forms.ModelForm):
+    update_cost = forms.BooleanField(
+        required=False, 
+        label="Alterar preço de custo"
+    )
+
     class Meta:
         model = models.Product
-        fields = ['title', 'category', 'brand', 'description',
-                  'serie_number','cost_price','selling_price']
+        fields = [
+            'title', 'category', 'brand', 'description',
+            'serie_number','cost_price','selling_price'
+        ]
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
@@ -20,7 +27,7 @@ class ProductForm(forms.ModelForm):
             'category': 'Categoria',
             'brand': 'Marca',
             'description': 'Descrição',
-            'serie_ number': 'Número de Série',
+            'serie_number': 'Número de Série',
             'cost_price': 'Preço de Custo',
             'selling_price': 'Preço de Venda',
         }

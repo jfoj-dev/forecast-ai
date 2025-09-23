@@ -8,6 +8,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brands, on_delete=models.PROTECT, related_name='products')
     description = models.TextField(null=True, blank=True)
     serie_number = models.CharField(max_length=200, null=True, blank=True)
+    last_cost_price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     cost_price = models.DecimalField(max_digits=20, decimal_places=2)
     selling_price = models.DecimalField(max_digits=20, decimal_places=2)
     quantity = models.IntegerField(default=0)

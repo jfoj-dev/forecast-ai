@@ -8,12 +8,75 @@
     <div class="card-body">
       <form method="post" class="form">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        <!-- Título -->
+        <div class="mb-3">
+          <label for="id_title" class="form-label">Título</label>
+          {{ form.title }}
+        </div>
+
+        <!-- Categoria -->
+        <div class="mb-3">
+          <label for="id_category" class="form-label">Categoria</label>
+          {{ form.category }}
+        </div>
+
+        <!-- Marca -->
+        <div class="mb-3">
+          <label for="id_brand" class="form-label">Marca</label>
+          {{ form.brand }}
+        </div>
+
+        <!-- Descrição -->
+        <div class="mb-3">
+          <label for="id_description" class="form-label">Descrição</label>
+          {{ form.description }}
+        </div>
+
+        <!-- Número de Série -->
+        <div class="mb-3">
+          <label for="id_serie_number" class="form-label">Número de Série</label>
+          {{ form.serie_number }}
+        </div>
+
+        <!-- Preço de Custo -->
+        <div class="mb-3">
+          <label for="id_cost_price" class="form-label">Preço de Custo</label>
+          {{ form.cost_price }}
+        </div>
+
+        <!-- Checkbox para atualizar preço de custo -->
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="update_cost" name="update_cost">
+          <label class="form-check-label" for="update_cost">Atualizar Preço de Custo</label>
+        </div>
+
+        <!-- Preço de Venda -->
+        <div class="mb-3">
+          <label for="id_selling_price" class="form-label">Preço de Venda</label>
+          {{ form.selling_price }}
+        </div>
+
         <button type="submit" class="btn btn-primary">Salvar Produto</button>
       </form>
     </div>
   </div>
-<a href="{% url 'product_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para a Lista de Produtos</a>
+  <a href="{% url 'product_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para a Lista de Produtos</a>
 </div>
 
-{%endblock%}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const costInput = document.getElementById('id_cost_price');
+    const updateCheckbox = document.getElementById('update_cost');
+
+    // Desabilita o campo por padrão
+    costInput.disabled = true;
+
+    // Quando o checkbox for alterado
+    updateCheckbox.addEventListener('change', function() {
+      costInput.disabled = !this.checked;
+    });
+  });
+</script>
+
+{% endblock %}
