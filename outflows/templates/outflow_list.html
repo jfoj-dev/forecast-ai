@@ -32,6 +32,7 @@ SGE - Saídas
                 <th>Produto</th>
                 <th>Quantidade</th>
                 <th>Data da Saída</th>
+                <th>Promoção</th>
                 <th class="text-center">Ações</th>
             </tr>
         </thead>
@@ -42,6 +43,7 @@ SGE - Saídas
                 <td>{{ outflow.product.title }}</td>
                 <td>{{ outflow.quantity }}</td>
                 <td>{{ outflow.created_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ outflow.promotion|yesno:"Sim,Não" }}</td>
                 <td class="text-center">
                     <a href="{% url 'outflow_detail' outflow.id %}" class="btn btn-info btn-sm" title="Visualizar">
                         <i class="bi bi-eye"></i>

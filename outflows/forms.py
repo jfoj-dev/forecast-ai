@@ -4,15 +4,17 @@ from . import models
 class OutflowForm(forms.ModelForm):
     class Meta:
         model = models.Outflow
-        fields = ['product', 'quantity', 'description']
+        fields = ['product', 'quantity', 'promotion', 'description']
         widgets = {
             'product': forms.Select(attrs={'class': 'form-control'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'promotion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
         labels = {
             'produto': 'Produto',
             'quantidade': 'Quantidade',
+            'promotion': 'Promoção',
             'description': 'Descrição',
         }
 

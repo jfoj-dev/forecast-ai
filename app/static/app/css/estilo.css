@@ -63,6 +63,81 @@
     transition: transform 0.2s ease-in-out;
 }
 
+/* Sidebar fixa */
+.sidebar {
+  width: 250px;      /* mesma largura da sidebar */
+  min-width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;     /* garante que a sidebar fique sobre o conteúdo */
+}
+
+/* Conteúdo principal */
+.main-content {
+  margin-left: 250px; /* espaço reservado para a sidebar */
+  transition: margin-left 0.3s;
+  padding: 2rem;
+}
+
+/* Sidebar fixa */
+.sidebar {
+    min-width: 220px;
+    max-width: 220px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    padding-top: 60px; /* se tiver header fixo */
+    z-index: 1000;
+}
+
+/* Ajusta o conteúdo principal para não sobrepor a sidebar */
+.content-area {
+    margin-left: 220px; /* mesma largura da sidebar */
+    min-height: calc(100vh - 60px - 40px); /* altura total - header - footer */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Footer fixo na parte inferior */
+footer {
+    margin-top: auto;
+    padding: 1rem 0;
+    width: 100%;
+    text-align: center;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+}
+
+body.dark-mode .sidebar {
+    background-color: #1c1c1c !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-mode .content-area {
+    background-color: #181818;
+    color: #f0f0f0;
+}
+
+body.dark-mode footer {
+    background-color: #1c1c1c;
+    color: #f0f0f0;
+}
+
+/* Evita overflow horizontal */
+html, body {
+    overflow-x: hidden;
+}
+
+
+
+
 
 
 

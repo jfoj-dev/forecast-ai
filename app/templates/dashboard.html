@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <!-- Card: Quantidade de Produtos -->
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Quantidade de Produtos</span>
+          <i class="bi bi-box-seam text-primary fs-4"></i>
+        </div>
+        <h3 class="fw-bold text-primary mt-2">14.785</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card: Custo de Estoque -->
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Custo de Estoque</span>
+          <i class="bi bi-cash-stack text-danger fs-4"></i>
+        </div>
+        <h3 class="fw-bold text-danger mt-2">R$ 19.912.240,00</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card: Valor do Estoque -->
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Valor do Estoque</span>
+          <i class="bi bi-graph-up-arrow text-success fs-4"></i>
+        </div>
+        <h3 class="fw-bold text-success mt-2">R$ 26.456.083,63</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card: Lucro de Estoque -->
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Lucro de Estoque</span>
+          <i class="bi bi-bar-chart-line text-warning fs-4"></i>
+        </div>
+        <h3 class="fw-bold text-warning mt-2">R$ 6.543.843,63</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Placeholder para gráficos -->
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body text-center text-muted">
+        [Gráfico de Vendas x Previsão de Demanda]
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body text-center text-muted">
+        [Categorias mais vendidas]
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

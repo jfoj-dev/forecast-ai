@@ -7,4 +7,4 @@ def home(request):
     context = {
         'product_metrics': product_metrics
     }
-    return render(request, 'home.html', context)
+    return render(request, 'dashboard.html', context)
