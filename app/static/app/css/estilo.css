@@ -135,6 +135,42 @@ html, body {
     overflow-x: hidden;
 }
 
+/* Container da paginação */
+.pagination-gray {
+  border-radius: 8px;          
+  overflow: hidden;
+  display: inline-flex;        
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+}
+
+/* Links da paginação */
+.pagination-gray .page-link {
+  background-color: #f5f5f5;   
+  color: #495057;               
+  border: none;                 
+  padding: 0.5rem 0.75rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Página ativa */
+.pagination-gray .page-item.active .page-link {
+  background-color: #6c757d;   
+  color: #fff;                  
+  font-weight: 500;
+}
+
+/* Hover */
+.pagination-gray .page-link:hover {
+  background-color: #dee2e6;   
+  color: #212529;
+}
+
+/* Pequeno espaçamento entre itens */
+.pagination-gray .page-item:not(:last-child) .page-link {
+  margin-right: 2px;
+}
+
+
 
 
 
