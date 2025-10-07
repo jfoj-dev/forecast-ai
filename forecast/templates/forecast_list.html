@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Previsões de Demanda{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h4 class="mb-0">📈 Previsão de Demanda</h4>
+      <small class="text-muted">Visão geral dos produtos e horizonte de 30 dias</small>
+    </div>
+
+    <div class="d-flex flex-wrap align-items-end gap-2">
+      <!-- Filtro de datas -->
+      <form method="get" class="d-flex align-items-end gap-2">
+        <div>
+          <label for="start_date" class="form-label mb-1">Início</label>
+          <input type="date" id="start_date" name="start_date"
+                 class="form-control form-control-sm"
+                 value="{{ request.GET.start_date }}">
+        </div>
+        <div>
+          <label for="end_date" class="form-label mb-1">Fim</label>
+          <input type="date" id="end_date" name="end_date"
+                 class="form-control form-control-sm"
+                 value="{{ request.GET.end_date }}">
+        </div>
+        <button type="submit" class="btn btn-outline-primary btn-sm mt-3">
+          <i class="bi bi-funnel"></i> Filtrar
+        </button>
+      </form>
+
+      <!-- Botões -->
+      <button id="generate-btn" class="btn btn-success">
+        <i class="bi bi-graph-up"></i> Gerar Previsões
+      </button>
+      <button id="export-btn" class="btn btn-outline-secondary">
+        <i class="bi bi-download"></i> Exportar CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="card shadow-sm p-3">
+        <div class="small text-muted">Total Previsto (30 dias)</div>
+        <div class="fw-bold fs-4" id="kpi-total">12.430</div>
+        <div class="text-muted">MAPE médio: <strong id="kpi-mape">6.7%</strong></div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card shadow-sm p-3">
+        <div class="small text-muted">Produtos em risco</div>
+        <div class="fw-bold fs-4 text-danger" id="kpi-risk">8</div>
+        <div class="text-muted">(estoque &lt; previsão)</div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card shadow-sm p-3">
+        <div class="small text-muted">Impacto de Promoções</div>
+        <div class="fw-bold fs-4" id="kpi-promo">+32%</div>
+        <div class="text-muted">média nas vendas</div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card shadow-sm p-3">
+        <div class="small text-muted">Última atualização</div>
+        <div class="text-muted" id="kpi-updated">Hoje • 09:12</div>
+        <div class="mt-2">
+          <button class="btn btn-sm btn-outline-primary">Ver histórico</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm p-3">
+        <h6>Histórico vs Previsão</h6>
+        <canvas id="lineChart" height="180"></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm p-3">
+        <h6>Top demandas previstas (30d)</h6>
+        <canvas id="barChart" height="180"></canvas>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm p-3">
+        <h6>Promoção vs Normal</h6>
+        <canvas id="pieChart" height="150"></canvas>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm p-3">
+        <h6>Sazonalidade mensal</h6>
+        <div id="heatmap" class="d-flex flex-wrap gap-1 mt-2"></div>
+        <small class="text-muted">Intensidade de vendas (escala de cor)</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card shadow-sm p-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="mb-0">Previsões por Produto</h6>
+      <small class="text-muted">
+        {% if request.GET.start_date and request.GET.end_date %}
+          Período: {{ request.GET.start_date }} → {{ request.GET.end_date }}
+        {% else %}
+          Horizonte: 30 dias
+        {% endif %}
+      </small>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover table-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Produto</th>
+            <th>Previsto (30d)</th>
+            <th>Estoque</th>
+            <th>Risco</th>
+            <th>MAPE</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="products-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  const sampleProducts = [
+    {id:1, name:'Produto A', stock:20, predicted:120, mape:5.2},
+    {id:2, name:'Produto B', stock:5, predicted:90, mape:8.1},
+    {id:3, name:'Produto C', stock:50, predicted:30, mape:3.4},
+    {id:4, name:'Produto D', stock:2, predicted:80, mape:12.9}
+  ];
+
+  const tbody = document.getElementById('products-tbody');
+  sampleProducts.forEach(p => {
+    const risk = p.stock < p.predicted
+      ? '<span class="badge bg-danger">Alto</span>'
+      : '<span class="badge bg-success">OK</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${p.name}</td>
+      <td>${p.predicted}</td>
+      <td>${p.stock}</td>
+      <td>${risk}</td>
+      <td>${p.mape}%</td>
+      <td><button class="btn btn-sm btn-outline-primary">Ver</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Line Chart
+  const lineCtx = document.getElementById('lineChart');
+  const labels = Array.from({length:60}, (_,i)=> new Date(Date.now() - (59-i)*864e5).toISOString().slice(0,10));
+  const realData = labels.map((_,i)=> Math.round(50 + 20*Math.sin(i/6) + Math.random()*15));
+  const forecastData = labels.slice(45).map(()=> Math.round(60 + Math.random()*20));
+  new Chart(lineCtx, {
+    type:'line',
+    data:{
+      labels: labels,
+      datasets:[
+        { label:'Vendas reais', data:realData, borderColor:'#0d6efd', tension:0.3, pointRadius:0 },
+        { label:'Previsão (30d)', data:Array(45).fill(null).concat(forecastData), borderColor:'#ff7b00', borderDash:[6,4], tension:0.3, pointRadius:0 }
+      ]
+    },
+    options:{plugins:{legend:{position:'top'}}, scales:{x:{display:false}}}
+  });
+
+  // Bar Chart
+  new Chart(document.getElementById('barChart'), {
+    type:'bar',
+    data:{labels:sampleProducts.map(p=>p.name), datasets:[{label:'Previsto (30d)', data:sampleProducts.map(p=>p.predicted)}]},
+    options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+
+  // Pie Chart
+  new Chart(document.getElementById('pieChart'), {
+    type:'doughnut',
+    data:{labels:['Promoção','Normal'], datasets:[{data:[32,68], backgroundColor:['#ff6384','#36a2eb']}]},
+    options:{plugins:{legend:{position:'bottom'}}}
+  });
+
+  // Heatmap
+  const container = document.getElementById('heatmap');
+  for(let i=0;i<36;i++){
+    const v=Math.floor(Math.random()*100);
+    const el=document.createElement('div');
+    el.style.width='calc(8.3% - 4px)';
+    el.style.height='20px';
+    el.style.borderRadius='4px';
+    el.style.background=`hsl(210,70%,${90 - Math.min(80, v/1.2)}%)`;
+    container.appendChild(el);
+  }
+
+  // Atualiza KPIs
+  const total = sampleProducts.reduce((s,p)=>s+p.predicted,0);
+  document.getElementById('kpi-total').innerText = total;
+  document.getElementById('kpi-risk').innerText = sampleProducts.filter(p=>p.stock<p.predicted).length;
+</script>
+{% endblock %}

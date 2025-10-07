@@ -56,6 +56,12 @@
           <i class="bi bi-arrow-up-right-square fs-5 me-2"></i> Saídas
         </a>
       </li>
+      <li class="nav-item mb-1">
+        <a href="{% url 'forecast_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
+          {% if request.resolver_match.url_name == 'forecast_list' %}active bg-dark{% endif %}">
+          <i class="bi bi-graph-up fs-5 me-2"></i> Previsões
+        </a>
+      </li>
     </ul>
   </div>
 
