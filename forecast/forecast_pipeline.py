@@ -1,44 +1,105 @@
-# forecast/forecast_pipeline.py
 from datetime import datetime, timedelta
-import random
-from .models import Forecast
+import pandas as pd
+import joblib
+from outflows.models import Outflow
 from products.models import Product
+from .models import Forecast
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from xgboost import XGBRegressor
+import numpy as np
 
+# -------------------------
+# Pipeline de previsão
+# -------------------------
 def run_pipeline():
     """
-    Função que simula a geração de previsões de demanda para todos os produtos
-    e salva no modelo Forecast. Retorna o número de previsões geradas.
+    Gera previsões de demanda e salva no modelo Forecast.
+    Para produtos sem histórico suficiente, gera previsões zeradas.
     """
-    # Definir horizonte de previsão (30 dias a partir de hoje)
-    today = datetime.today().date()
-    horizon_days = 30
-
-    # Obter todos os produtos
     products = Product.objects.all()
-    if not products.exists():
-        return 0
-
-    total_generated = 0
+    forecast_objects = []
 
     for product in products:
-        for day_offset in range(horizon_days):
-            forecast_date = today + timedelta(days=day_offset)
+        outflows = Outflow.objects.filter(product=product).order_by('created_at')
 
-            # Simular quantidade prevista (aleatório baseado no estoque atual)
-            predicted_quantity = max(0, int(product.quantity * random.uniform(0.8, 1.5)))
+        if outflows.exists():
+            # Cria DataFrame
+            data = pd.DataFrame(list(outflows.values('created_at', 'quantity', 'promotion')))
+            data['created_at'] = pd.to_datetime(data['created_at'])
+            data = data.set_index('created_at')
 
-            # Simular MAPE aleatório
-            mape = round(random.uniform(5, 20), 2)
+            # Resample diário e preencher lacunas
+            data = data.resample('D').sum()
+            data['promotion'] = data['promotion'].astype(int)
 
-            # Salvar ou atualizar previsão existente para o mesmo produto e data
-            forecast_obj, created = Forecast.objects.update_or_create(
+            # Features e target
+            X = data[['promotion']]
+            y = data['quantity']
+
+            # Treina modelo se houver dados suficientes
+            if len(y) > 5:
+                model = XGBRegressor(n_estimators=100, random_state=42)
+                model.fit(X, y)
+                # Previsão para os próximos 30 dias
+                future_dates = pd.date_range(datetime.today(), periods=30)
+                X_future = pd.DataFrame({'promotion': [0]*30}, index=future_dates)
+                y_pred = model.predict(X_future)
+            else:
+                # Poucos dados → gera zeros
+                future_dates = pd.date_range(datetime.today(), periods=30)
+                y_pred = [0]*30
+        else:
+            # Sem histórico → gera zeros
+            future_dates = pd.date_range(datetime.today(), periods=30)
+            y_pred = [0]*30
+
+        # Cria ou atualiza previsões (evita duplicidade)
+        for date, pred in zip(future_dates, y_pred):
+            Forecast.objects.update_or_create(
                 product=product,
-                date=forecast_date,
-                defaults={
-                    "predicted_quantity": predicted_quantity,
-                    "mape": mape,
-                }
+                date=date,
+                defaults={'predicted_quantity': max(0, round(pred))}
             )
-            total_generated += 1
+            forecast_objects.append(1)
 
-    return total_generated
+    return len(forecast_objects)
+
+# -------------------------
+# Treinamento do modelo
+# -------------------------
+def train_forecast_model():
+    """
+    Treina modelo global de previsão de demanda e retorna métricas.
+    """
+    outflows = Outflow.objects.all()
+    if not outflows.exists():
+        return None
+
+    df = pd.DataFrame(list(outflows.values('product_id', 'quantity', 'promotion', 'created_at')))
+    df['created_at'] = pd.to_datetime(df['created_at'])
+    df['promotion'] = df['promotion'].astype(int)
+
+    X = df[['product_id', 'promotion']]
+    y = df['quantity']
+
+    if len(X) < 5:
+        return None  # dados insuficientes
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = XGBRegressor(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    metrics = {
+        'mae': mean_absolute_error(y_test, y_pred),
+        'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
+        'r2': r2_score(y_test, y_pred)
+    }
+
+    # Salva modelo
+    joblib.dump(model, 'forecast/trained_model.pkl')
+
+    return metrics

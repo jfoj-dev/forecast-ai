@@ -32,6 +32,11 @@
         </button>
       </form>
 
+      <!-- Botões de ação -->
+      <button id="train-btn" class="btn btn-warning mt-3">
+        <i class="bi bi-hammer"></i> Treinar Modelo
+      </button>
+
       <button id="generate-btn" class="btn btn-success mt-3">
         <i class="bi bi-graph-up"></i> Gerar Previsões
       </button>
@@ -147,7 +152,7 @@
                   <span class="badge bg-success">OK</span>
                 {% endif %}
               </td>
-              <td>{{ f.mape }}%</td>
+              <td>{{ f.mape|default:"-" }}%</td>
               <td><button class="btn btn-sm btn-outline-primary">Ver</button></td>
             </tr>
           {% empty %}
@@ -165,96 +170,117 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-  const barLabels = {{ chart_labels|safe|default:"[]" }};
-  const barData = {{ chart_data|safe|default:"[]" }};
-  const lineLabels = {{ line_labels|safe|default:"[]" }};
-  const lineReal = {{ line_real|safe|default:"[]" }};
-  const lineForecast = {{ line_forecast|safe|default:"[]" }};
-  const heatData = {{ heatmap|safe|default:"[]" }};
-  const promoCount = {{ promo_count|default:0 }};
-  const normalCount = {{ normal_count|default:0 }};
+const barLabels = {{ chart_labels|safe|default:"[]" }};
+const barData = {{ chart_data|safe|default:"[]" }};
+const lineLabels = {{ line_labels|safe|default:"[]" }};
+const lineReal = {{ line_real|safe|default:"[]" }};
+const lineForecast = {{ line_forecast|safe|default:"[]" }};
+const heatData = {{ heatmap|safe|default:"[]" }};
+const promoCount = {{ promo_count|default:0 }};
+const normalCount = {{ normal_count|default:0 }};
 
-  // Gráficos
-  if (document.getElementById('barChart')) {
-    new Chart(document.getElementById('barChart'), {
-      type: 'bar',
-      data: { labels: barLabels, datasets: [{ data: barData, label: 'Previsto (30d)', backgroundColor: '#0d6efd' }] },
-      options: { plugins: { legend: { display: false } } }
-    });
-  }
-
-  if (document.getElementById('pieChart')) {
-    new Chart(document.getElementById('pieChart'), {
-      type: 'doughnut',
-      data: { labels:['Promoção','Normal'], datasets:[{data:[promoCount, normalCount], backgroundColor:['#ff6384','#36a2eb']}] },
-      options:{plugins:{legend:{position:'bottom'}}}
-    });
-  }
-
-  if (document.getElementById('lineChart')) {
-    new Chart(document.getElementById('lineChart'), {
-      type:'line',
-      data:{
-        labels: lineLabels,
-        datasets:[
-          { label:'Vendas reais', data:lineReal, borderColor:'#0d6efd', tension:0.3 },
-          { label:'Previsão', data:lineForecast, borderColor:'#ff7b00', borderDash:[6,4], tension:0.3 }
-        ]
-      },
-      options:{plugins:{legend:{position:'top'}}}
-    });
-  }
-
-  if (document.getElementById('heatmap')) {
-    const container = document.getElementById('heatmap');
-    heatData.forEach(v=>{
-      const el = document.createElement('div');
-      el.style.width='calc(8.3% - 4px)';
-      el.style.height='20px';
-      el.style.borderRadius='4px';
-      el.style.background=`hsl(210,70%,${90 - Math.min(80, v/1.2)}%)`;
-      container.appendChild(el);
-    });
-  }
-
-  //AJAX: gerar previsões
-  document.getElementById("generate-btn").addEventListener("click", async () => {
-    const btn = document.getElementById("generate-btn");
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Gerando...';
-
-    try {
-      const response = await fetch("{% url 'generate_forecast' %}", {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-        },
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        alert(data.message);
-        location.reload();
-      } else {
-        alert("Erro: " + data.error);
-      }
-    } catch (err) {
-      alert("Erro inesperado ao gerar previsões.");
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-graph-up"></i> Gerar Previsões';
+// Charts
+if (barLabels.length && barData.length) {
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: { labels: barLabels, datasets: [{ data: barData, label: 'Previsto (30d)', backgroundColor: '#0d6efd' }] },
+    options: { plugins: { legend: { display: false } } }
   });
+}
 
-  //AJAX: exportar CSV
-  document.getElementById("export-btn").addEventListener("click", () => {
-    const start = document.getElementById("start_date").value;
-    const end = document.getElementById("end_date").value;
-    let url = "{% url 'export_forecast_csv' %}";
-    if (start && end) {
-      url += `?start_date=${start}&end_date=${end}`;
-    }
-    window.location.href = url; // dispara download
+if (document.getElementById('pieChart')) {
+  new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: { labels:['Promoção','Normal'], datasets:[{data:[promoCount, normalCount], backgroundColor:['#ff6384','#36a2eb']}] },
+    options:{plugins:{legend:{position:'bottom'}}}
   });
+}
+
+if (lineLabels.length && (lineReal.length || lineForecast.length)) {
+  new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{
+      labels: lineLabels,
+      datasets:[
+        { label:'Vendas reais', data:lineReal, borderColor:'#0d6efd', tension:0.3 },
+        { label:'Previsão', data:lineForecast, borderColor:'#ff7b00', borderDash:[6,4], tension:0.3 }
+      ]
+    },
+    options:{plugins:{legend:{position:'top'}}}
+  });
+}
+
+if (document.getElementById('heatmap')) {
+  const container = document.getElementById('heatmap');
+  heatData.forEach(v=>{
+    const el = document.createElement('div');
+    el.style.width='calc(8.3% - 4px)';
+    el.style.height='20px';
+    el.style.borderRadius='4px';
+    el.style.background=`hsl(210,70%,${90 - Math.min(80, v/1.2)}%)`;
+    container.appendChild(el);
+  });
+}
+
+// AJAX: gerar previsões
+document.getElementById("generate-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("generate-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Gerando...';
+
+  try {
+    const response = await fetch("{% url 'generate_forecast' %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": "{{ csrf_token }}" },
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      alert(data.message);
+      location.reload();
+    } else {
+      alert("Erro: " + data.error);
+    }
+  } catch (err) {
+    alert("Erro inesperado ao gerar previsões.");
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-graph-up"></i> Gerar Previsões';
+});
+
+// AJAX: exportar CSV
+document.getElementById("export-btn").addEventListener("click", () => {
+  const start = document.getElementById("start_date").value;
+  const end = document.getElementById("end_date").value;
+  window.location.href = `{% url 'export_forecast_csv' %}?start_date=${start}&end_date=${end}`;
+});
+
+// AJAX: treinar modelo
+document.getElementById("train-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("train-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Treinando...';
+
+  try {
+    const response = await fetch("{% url 'train_forecast_model' %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": "{{ csrf_token }}" },
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      alert(data.message);
+    } else {
+      alert("Erro: " + data.error);
+    }
+  } catch (err) {
+    alert("Erro inesperado ao treinar modelo.");
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-hammer"></i> Treinar Modelo';
+});
 </script>
+
 {% endblock %}

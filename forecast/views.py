@@ -1,19 +1,18 @@
 from django.views.generic import TemplateView
 from django.db.models import Sum, F
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from datetime import datetime, timedelta
 from .models import Forecast
 from outflows.models import Outflow
-from .forecast_pipeline import run_pipeline
+from .forecast_pipeline import run_pipeline, train_forecast_model  # import ajustado
 from django.views import View
-
 import csv
-from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
-
-
-
-
+# -------------------------
+# Lista de previsões
+# -------------------------
 class ForecastListView(TemplateView):
     template_name = "forecast_list.html"
 
@@ -50,14 +49,22 @@ class ForecastListView(TemplateView):
         chart_labels = [f['product__title'] for f in top_forecasts]
         chart_data = [f['total_pred'] for f in top_forecasts]
 
-        # Histórico vs previsão
+        # Histórico vs previsão (corrigido para não gerar NamedAgg)
         line_labels, line_real, line_forecast = [], [], []
         date_cursor = start_date
         while date_cursor <= end_date:
             daily_forecasts = forecasts.filter(date=date_cursor)
             line_labels.append(date_cursor.strftime("%d/%m"))
-            line_real.append(sum(daily_forecasts.values_list('product__quantity', flat=True)))
-            line_forecast.append(sum(daily_forecasts.values_list('predicted_quantity', flat=True)))
+            
+            # Quantidade real: somando o estoque atual dos produtos
+            daily_real = sum(f.product.quantity for f in daily_forecasts)
+            
+            # Quantidade prevista: somando previsto
+            daily_pred = daily_forecasts.aggregate(total=Sum('predicted_quantity'))['total'] or 0
+            
+            line_real.append(daily_real)
+            line_forecast.append(daily_pred)
+            
             date_cursor += timedelta(days=1)
 
         # Heatmap
@@ -88,6 +95,9 @@ class ForecastListView(TemplateView):
         return self.render_to_response(context)
 
 
+# -------------------------
+# Gerar previsões
+# -------------------------
 class GenerateForecastView(View):
     def post(self, request, *args, **kwargs):
         try:
@@ -96,6 +106,10 @@ class GenerateForecastView(View):
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
 
+
+# -------------------------
+# Exportar CSV
+# -------------------------
 class ExportForecastCSVView(View):
     def get(self, request, *args, **kwargs):
         start_date_str = request.GET.get('start_date')
@@ -122,3 +136,20 @@ class ExportForecastCSVView(View):
             ])
 
         return response
+
+
+# -------------------------
+# Treinar modelo via AJAX
+# -------------------------
+@method_decorator(csrf_exempt, name='dispatch')  # permite teste com AJAX
+class TrainModelView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            metrics = train_forecast_model()
+            if metrics:
+                message = f"Modelo treinado! R²: {metrics['r2']:.2f}, RMSE: {metrics['rmse']:.2f}, MAE: {metrics['mae']:.2f}"
+            else:
+                message = "Treinamento não foi executado (dados insuficientes)."
+            return JsonResponse({"success": True, "message": message})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
