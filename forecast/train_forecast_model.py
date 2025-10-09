@@ -10,6 +10,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from xgboost import XGBRegressor
 from products.models import Product
 from outflows.models import Outflow
+from django.db.models import Sum  # IMPORT CORRETO PARA AGGREGATE
 
 MODEL_PATH = os.path.join(settings.BASE_DIR, "forecast", "trained_model.pkl")
 
@@ -19,18 +20,13 @@ def train_forecast_model():
     products = Product.objects.all()
     if not products.exists():
         print("Nenhum produto encontrado.")
-        return
+        return None
 
     # Preparar DataFrame com features
     data = []
     for product in products:
-        total_outflow = Outflow.objects.filter(product=product).aggregate(
-            total=pd.NamedAgg(column='quantity', aggfunc='sum')
-        )['total'] or 0
-
-        promo_outflow = Outflow.objects.filter(product=product, promotion=True).aggregate(
-            total=pd.NamedAgg(column='quantity', aggfunc='sum')
-        )['total'] or 0
+        total_outflow = Outflow.objects.filter(product=product).aggregate(total=Sum('quantity'))['total'] or 0
+        promo_outflow = Outflow.objects.filter(product=product, promotion=True).aggregate(total=Sum('quantity'))['total'] or 0
 
         data.append({
             'quantity': product.quantity or 0,
@@ -38,11 +34,14 @@ def train_forecast_model():
             'selling_price': product.selling_price or 0,
             'total_outflow': total_outflow,
             'promo_outflow': promo_outflow,
-            # Aqui podemos colocar a variável alvo; para exemplo, vamos usar `total_outflow`
-            'target': total_outflow
+            'target': total_outflow  # variável alvo
         })
 
     df = pd.DataFrame(data)
+    if df.empty:
+        print("DataFrame vazio, não é possível treinar.")
+        return None
+
     X = df[['quantity', 'cost_price', 'selling_price', 'total_outflow', 'promo_outflow']]
     y = df['target']
 
@@ -67,15 +66,21 @@ def train_forecast_model():
     # Avaliação
     y_pred = model.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
-    rmse = mean_squared_error(y_test, y_pred, squared=False)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))  # CALCULANDO RMSE MANUALMENTE
     r2 = r2_score(y_test, y_pred)
 
+    # Cálculo do MAPE
+    mape = np.mean(np.abs((y_test - y_pred) / np.maximum(y_test, 1))) * 100  # evita divisão por zero
+
     print(f"Modelo treinado com sucesso!")
-    print(f"MAE: {mae:.2f},RMSE: {rmse:.2f},R²: {r2:.2f}")
+    print(f"R²: {r2:.2f}, RMSE: {rmse:.2f}, MAE: {mae:.2f}, MAPE: {mape:.2f}%")
 
     # Salvar modelo + scaler
     dump({"model": model, "scaler": scaler}, MODEL_PATH)
     print(f"Modelo salvo em: {MODEL_PATH}")
+
+    # Retornar métricas para a view
+    return {"r2": r2, "rmse": rmse, "mae": mae, "mape": mape}
 
 if __name__ == "__main__":
     train_forecast_model()

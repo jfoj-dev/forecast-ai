@@ -36,7 +36,6 @@
       <button id="train-btn" class="btn btn-warning mt-3">
         <i class="bi bi-hammer"></i> Treinar Modelo
       </button>
-
       <button id="generate-btn" class="btn btn-success mt-3">
         <i class="bi bi-graph-up"></i> Gerar Previsões
       </button>
@@ -51,15 +50,15 @@
     <div class="col-md-3 col-sm-6">
       <div class="card shadow-sm p-3">
         <div class="small text-muted">Total Previsto (30 dias)</div>
-        <div class="fw-bold fs-4" id="kpi-total">{{ total_predicted|default_if_none:"0" }}</div>
-        <div class="text-muted">MAPE médio: <strong id="kpi-mape">{{ avg_mape|default_if_none:"-" }}%</strong></div>
+        <div class="fw-bold fs-4">{{ total_predicted|default_if_none:"0" }}</div>
+        <div class="text-muted">MAPE médio: <strong>{{ avg_mape|default_if_none:"-" }}%</strong></div>
       </div>
     </div>
 
     <div class="col-md-3 col-sm-6">
       <div class="card shadow-sm p-3">
         <div class="small text-muted">Produtos em risco</div>
-        <div class="fw-bold fs-4 text-danger" id="kpi-risk">{{ products_risk|default_if_none:"0" }}</div>
+        <div class="fw-bold fs-4 text-danger">{{ products_risk|default_if_none:"0" }}</div>
         <div class="text-muted">(estoque &lt; previsão)</div>
       </div>
     </div>
@@ -67,7 +66,7 @@
     <div class="col-md-3 col-sm-6">
       <div class="card shadow-sm p-3">
         <div class="small text-muted">Impacto de Promoções</div>
-        <div class="fw-bold fs-4" id="kpi-promo">{{ promo_impact|default_if_none:"0" }}%</div>
+        <div class="fw-bold fs-4">{{ promo_impact|default_if_none:"0" }}%</div>
         <div class="text-muted">média nas vendas</div>
       </div>
     </div>
@@ -75,10 +74,7 @@
     <div class="col-md-3 col-sm-6">
       <div class="card shadow-sm p-3">
         <div class="small text-muted">Última atualização</div>
-        <div class="text-muted" id="kpi-updated">{{ last_update|default_if_none:"-" }}</div>
-        <div class="mt-2">
-          <button class="btn btn-sm btn-outline-primary">Ver histórico</button>
-        </div>
+        <div class="text-muted">{{ last_update|default_if_none:"-" }}</div>
       </div>
     </div>
   </div>
@@ -136,7 +132,6 @@
             <th>Estoque</th>
             <th>Risco</th>
             <th>MAPE</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -153,11 +148,10 @@
                 {% endif %}
               </td>
               <td>{{ f.mape|default:"-" }}%</td>
-              <td><button class="btn btn-sm btn-outline-primary">Ver</button></td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="6" class="text-center">Nenhuma previsão encontrada.</td>
+              <td colspan="5" class="text-center">Nenhuma previsão encontrada.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -179,7 +173,7 @@ const heatData = {{ heatmap|safe|default:"[]" }};
 const promoCount = {{ promo_count|default:0 }};
 const normalCount = {{ normal_count|default:0 }};
 
-// Charts
+// Gráfico de barras
 if (barLabels.length && barData.length) {
   new Chart(document.getElementById('barChart'), {
     type: 'bar',
@@ -188,6 +182,7 @@ if (barLabels.length && barData.length) {
   });
 }
 
+// Pizza Promoção vs Normal
 if (document.getElementById('pieChart')) {
   new Chart(document.getElementById('pieChart'), {
     type: 'doughnut',
@@ -196,6 +191,7 @@ if (document.getElementById('pieChart')) {
   });
 }
 
+// Linha Histórico vs Previsão
 if (lineLabels.length && (lineReal.length || lineForecast.length)) {
   new Chart(document.getElementById('lineChart'), {
     type:'line',
@@ -210,6 +206,7 @@ if (lineLabels.length && (lineReal.length || lineForecast.length)) {
   });
 }
 
+// Heatmap mensal
 if (document.getElementById('heatmap')) {
   const container = document.getElementById('heatmap');
   heatData.forEach(v=>{
@@ -234,16 +231,9 @@ document.getElementById("generate-btn").addEventListener("click", async () => {
       headers: { "X-CSRFToken": "{{ csrf_token }}" },
     });
     const data = await response.json();
-
-    if (data.success) {
-      alert(data.message);
-      location.reload();
-    } else {
-      alert("Erro: " + data.error);
-    }
-  } catch (err) {
-    alert("Erro inesperado ao gerar previsões.");
-  }
+    alert(data.success ? data.message : "Erro: " + data.error);
+    if (data.success) location.reload();
+  } catch { alert("Erro inesperado ao gerar previsões."); }
 
   btn.disabled = false;
   btn.innerHTML = '<i class="bi bi-graph-up"></i> Gerar Previsões';
@@ -268,19 +258,11 @@ document.getElementById("train-btn").addEventListener("click", async () => {
       headers: { "X-CSRFToken": "{{ csrf_token }}" },
     });
     const data = await response.json();
-
-    if (data.success) {
-      alert(data.message);
-    } else {
-      alert("Erro: " + data.error);
-    }
-  } catch (err) {
-    alert("Erro inesperado ao treinar modelo.");
-  }
+    alert(data.success ? data.message : "Erro: " + data.error);
+  } catch { alert("Erro inesperado ao treinar modelo."); }
 
   btn.disabled = false;
   btn.innerHTML = '<i class="bi bi-hammer"></i> Treinar Modelo';
 });
 </script>
-
 {% endblock %}

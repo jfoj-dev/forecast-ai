@@ -1,14 +1,17 @@
+# forecast/views.py
 from django.views.generic import TemplateView
+from django.views import View
 from django.db.models import Sum, F
 from django.http import JsonResponse, HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
+import csv
+
 from .models import Forecast
 from outflows.models import Outflow
-from .forecast_pipeline import run_pipeline, train_forecast_model  # import ajustado
-from django.views import View
-import csv
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from .forecast_pipeline import run_pipeline, train_forecast_model
+
 
 # -------------------------
 # Lista de previsões
@@ -28,11 +31,19 @@ class ForecastListView(TemplateView):
 
         # KPIs
         total_predicted = forecasts.aggregate(total=Sum('predicted_quantity'))['total'] or 0
-        if forecasts.exists():
-            total_mape = forecasts.aggregate(total=Sum('mape'))['total'] or 0
-            avg_mape = total_mape / forecasts.count()
-        else:
-            avg_mape = 0
+
+        # MAPE médio (considera todos os produtos/dias, usa 0 se não houver vendas)
+        mape_list = []
+        for f in forecasts:
+            real_qty = Outflow.objects.filter(
+                product=f.product,
+                created_at__date=f.date
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+
+            mape_val = abs((real_qty - f.predicted_quantity) / real_qty) * 100 if real_qty > 0 else 0
+            mape_list.append(mape_val)
+
+        avg_mape = sum(mape_list) / len(mape_list) if mape_list else 0
 
         products_risk = forecasts.filter(product__quantity__lt=F('predicted_quantity')).count()
         last_update = forecasts.order_by('-date').first().date if forecasts.exists() else None
@@ -49,22 +60,22 @@ class ForecastListView(TemplateView):
         chart_labels = [f['product__title'] for f in top_forecasts]
         chart_data = [f['total_pred'] for f in top_forecasts]
 
-        # Histórico vs previsão (corrigido para não gerar NamedAgg)
+        # Histórico vs previsão
         line_labels, line_real, line_forecast = [], [], []
         date_cursor = start_date
         while date_cursor <= end_date:
             daily_forecasts = forecasts.filter(date=date_cursor)
             line_labels.append(date_cursor.strftime("%d/%m"))
-            
-            # Quantidade real: somando o estoque atual dos produtos
-            daily_real = sum(f.product.quantity for f in daily_forecasts)
-            
-            # Quantidade prevista: somando previsto
+
+            daily_real = sum(
+                Outflow.objects.filter(product=f.product, created_at__date=date_cursor).aggregate(total=Sum('quantity'))['total'] or 0
+                for f in daily_forecasts
+            )
             daily_pred = daily_forecasts.aggregate(total=Sum('predicted_quantity'))['total'] or 0
-            
+
             line_real.append(daily_real)
             line_forecast.append(daily_pred)
-            
+
             date_cursor += timedelta(days=1)
 
         # Heatmap
@@ -127,12 +138,17 @@ class ExportForecastCSVView(View):
         writer = csv.writer(response)
         writer.writerow(['Produto', 'Data', 'Previsto', 'Estoque', 'MAPE'])
         for f in forecasts:
+            real_qty = Outflow.objects.filter(
+                product=f.product,
+                created_at__date=f.date
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+            mape_val = abs((real_qty - f.predicted_quantity) / real_qty * 100) if real_qty > 0 else 0
             writer.writerow([
                 f.product.title,
                 f.date,
                 f.predicted_quantity,
                 f.product.quantity,
-                f.mape
+                round(mape_val, 2)
             ])
 
         return response
@@ -141,13 +157,15 @@ class ExportForecastCSVView(View):
 # -------------------------
 # Treinar modelo via AJAX
 # -------------------------
-@method_decorator(csrf_exempt, name='dispatch')  # permite teste com AJAX
+@method_decorator(csrf_exempt, name='dispatch')
 class TrainModelView(View):
     def post(self, request, *args, **kwargs):
         try:
             metrics = train_forecast_model()
             if metrics:
-                message = f"Modelo treinado! R²: {metrics['r2']:.2f}, RMSE: {metrics['rmse']:.2f}, MAE: {metrics['mae']:.2f}"
+                message = (f"Modelo treinado! R²: {metrics['r2']:.2f}, "
+                           f"RMSE: {metrics['rmse']:.2f}, MAE: {metrics['mae']:.2f}, "
+                           f"MAPE: {metrics['mape']:.2f}%")
             else:
                 message = "Treinamento não foi executado (dados insuficientes)."
             return JsonResponse({"success": True, "message": message})
