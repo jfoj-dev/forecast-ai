@@ -32,7 +32,7 @@
         </button>
       </form>
 
-      <!-- Botões de ação -->
+      <!-- Botões -->
       <button id="train-btn" class="btn btn-warning mt-3">
         <i class="bi bi-hammer"></i> Treinar Modelo
       </button>
@@ -50,7 +50,7 @@
     <div class="col-md-3 col-sm-6">
       <div class="card shadow-sm p-3">
         <div class="small text-muted">Total Previsto (30 dias)</div>
-        <div class="fw-bold fs-4">{{ total_predicted|default_if_none:"0" }}</div>
+        <div class="fw-bold fs-4">{{ total_predicted|floatformat:0|default_if_none:"0" }}</div>
         <div class="text-muted">MAPE médio: <strong>{{ avg_mape|default_if_none:"-" }}%</strong></div>
       </div>
     </div>
@@ -111,7 +111,7 @@
     </div>
   </div>
 
-  <!-- Tabela -->
+  <!-- Tabela agrupada por data -->
   <div class="card shadow-sm p-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h6 class="mb-0">Previsões por Produto</h6>
@@ -123,35 +123,49 @@
         {% endif %}
       </small>
     </div>
+
     <div class="table-responsive">
       <table class="table table-hover table-sm align-middle">
         <thead class="table-light">
           <tr>
             <th>Produto</th>
-            <th>Previsto (30d)</th>
+            <th>Previsto</th>
             <th>Estoque</th>
             <th>Risco</th>
             <th>MAPE</th>
           </tr>
         </thead>
         <tbody>
-          {% for f in forecasts %}
-            <tr>
-              <td>{{ f.product.title }}</td>
-              <td>{{ f.predicted_quantity }}</td>
-              <td>{{ f.product.quantity }}</td>
-              <td>
-                {% if f.product.quantity < f.predicted_quantity %}
-                  <span class="badge bg-danger">Alto</span>
-                {% else %}
-                  <span class="badge bg-success">OK</span>
-                {% endif %}
-              </td>
-              <td>{{ f.mape|default:"-" }}%</td>
+          {% for date, daily_forecasts in forecasts_by_date.items %}
+            <!-- Cabeçalho da data -->
+            <tr class="table-secondary">
+              <td colspan="5"><strong>{{ date }}</strong></td>
             </tr>
+
+            {% for f in daily_forecasts %}
+              <tr>
+                <td>{{ f.product.title }}</td>
+                <td>{{ f.predicted_quantity|floatformat:2 }}</td>
+                <td>{{ f.product.quantity|floatformat:0 }}</td>
+                <td>
+                  {% if f.product.quantity < f.predicted_quantity %}
+                    <span class="badge bg-danger" title="Estoque inferior à previsão">Alto</span>
+                  {% else %}
+                    <span class="badge bg-success" title="Estoque suficiente">OK</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if f.daily_mape is not None %}
+                    {{ f.daily_mape|floatformat:2 }}%
+                  {% else %}
+                    <span class="text-muted">–</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
           {% empty %}
             <tr>
-              <td colspan="5" class="text-center">Nenhuma previsão encontrada.</td>
+              <td colspan="5" class="text-center text-muted">Nenhuma previsão encontrada.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -224,17 +238,12 @@ document.getElementById("generate-btn").addEventListener("click", async () => {
   const btn = document.getElementById("generate-btn");
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Gerando...';
-
   try {
-    const response = await fetch("{% url 'generate_forecast' %}", {
-      method: "POST",
-      headers: { "X-CSRFToken": "{{ csrf_token }}" },
-    });
+    const response = await fetch("{% url 'generate_forecast' %}", { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } });
     const data = await response.json();
     alert(data.success ? data.message : "Erro: " + data.error);
     if (data.success) location.reload();
   } catch { alert("Erro inesperado ao gerar previsões."); }
-
   btn.disabled = false;
   btn.innerHTML = '<i class="bi bi-graph-up"></i> Gerar Previsões';
 });
@@ -251,16 +260,11 @@ document.getElementById("train-btn").addEventListener("click", async () => {
   const btn = document.getElementById("train-btn");
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Treinando...';
-
   try {
-    const response = await fetch("{% url 'train_forecast_model' %}", {
-      method: "POST",
-      headers: { "X-CSRFToken": "{{ csrf_token }}" },
-    });
+    const response = await fetch("{% url 'train_forecast_model' %}", { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } });
     const data = await response.json();
     alert(data.success ? data.message : "Erro: " + data.error);
   } catch { alert("Erro inesperado ao treinar modelo."); }
-
   btn.disabled = false;
   btn.innerHTML = '<i class="bi bi-hammer"></i> Treinar Modelo';
 });
