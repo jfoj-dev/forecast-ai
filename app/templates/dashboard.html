@@ -1,174 +1,256 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard Executivo{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <h1 class="h3 fw-bold">Dashboard Executivo</h1>
+<style>
+  /* ---------- Ajustes visuais modernos ---------- */
+  h1, h5 { font-weight: 600; }
+  .card {
+    border: none;
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
+  .table-hover tbody tr:hover {
+    background-color: rgba(13,110,253,0.05);
+  }
+  .table thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .form-label {
+    font-weight: 500;
+  }
+  .btn-primary {
+    border-radius: 0.75rem;
+  }
 
-    <!-- Filtro de período -->
-    <form method="get" class="d-flex gap-2 align-items-end flex-wrap">
-        <div class="d-flex flex-column">
-            <label for="data_inicio" class="form-label">Data Início</label>
-            <input type="date" name="data_inicio" id="data_inicio" class="form-control" value="{{ data_inicio }}">
-        </div>
-        <div class="d-flex flex-column">
-            <label for="data_fim" class="form-label">Data Fim</label>
-            <input type="date" name="data_fim" id="data_fim" class="form-control" value="{{ data_fim }}">
-        </div>
-        <button class="btn btn-primary mt-3" type="submit">Atualizar</button>
-    </form>
+  /* 🔹 Corrige inputs de data no modo escuro e claro */
+  input[type="date"] {
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-body-bg) !important;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    transition: all 0.2s ease-in-out;
+  }
+  input[type="date"]:focus {
+    outline: none;
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+  }
+
+  /* 🔹 Garante contraste adequado no modo escuro */
+  @media (prefers-color-scheme: dark) {
+    input[type="date"] {
+      color-scheme: dark;
+      color: #f8f9fa !important;
+      background-color: #212529 !important;
+      border-color: #495057;
+    }
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+  <h1 class="h3 fw-bold mb-0">📊 Dashboard</h1>
+
+  <form method="get" class="d-flex gap-3 align-items-end flex-wrap bg-light bg-opacity-10 p-3 rounded-3 shadow-sm">
+    <div class="d-flex flex-column">
+      <label for="data_inicio" class="form-label">Data Início</label>
+      <input type="date" name="data_inicio" id="data_inicio" class="form-control form-control-sm" value="{{ data_inicio }}">
+    </div>
+    <div class="d-flex flex-column">
+      <label for="data_fim" class="form-label">Data Fim</label>
+      <input type="date" name="data_fim" id="data_fim" class="form-control form-control-sm" value="{{ data_fim }}">
+    </div>
+    <button class="btn btn-primary btn-sm mt-3 px-4" type="submit">
+      <i class="bi bi-arrow-repeat me-1"></i> Atualizar
+    </button>
+  </form>
 </div>
 
 <!-- Painel de KPIs -->
 <div class="row g-4 mb-4">
-    {% comment %} KPI Cards principais {% endcomment %}
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Produtos</span>
-                    <i class="bi bi-box-seam text-primary fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-primary">{{ total_produtos }}</h3>
-                <small class="text-muted">Total de produtos cadastrados</small>
-            </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card shadow-sm border-0 rounded-3 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Produtos</span>
+          <i class="bi bi-box-seam text-primary fs-4"></i>
         </div>
+        <h3 class="fw-bold text-primary">{{ total_produtos }}</h3>
+        <small class="text-muted">Total de produtos cadastrados</small>
+      </div>
     </div>
+  </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Custo Estoque</span>
-                    <i class="bi bi-cash-stack text-danger fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-danger">R$ {{ custo_estoque|floatformat:2 }}</h3>
-                <small class="text-muted">Investimento total no estoque</small>
-            </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card shadow-sm border-0 rounded-3 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Custo Estoque</span>
+          <i class="bi bi-cash-stack text-danger fs-4"></i>
         </div>
+        <h3 class="fw-bold text-danger">R$ {{ custo_estoque|floatformat:2 }}</h3>
+        <small class="text-muted">Investimento total no estoque</small>
+      </div>
     </div>
+  </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Valor Estoque</span>
-                    <i class="bi bi-graph-up-arrow text-success fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-success">R$ {{ valor_estoque|floatformat:2 }}</h3>
-                <small class="text-muted">Preço total de venda do estoque</small>
-            </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card shadow-sm border-0 rounded-3 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Valor Estoque</span>
+          <i class="bi bi-graph-up-arrow text-success fs-4"></i>
         </div>
+        <h3 class="fw-bold text-success">R$ {{ valor_estoque|floatformat:2 }}</h3>
+        <small class="text-muted">Preço total de venda do estoque</small>
+      </div>
     </div>
+  </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Lucro Estoque</span>
-                    <i class="bi bi-bar-chart-line text-warning fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-warning">R$ {{ lucro_estoque|floatformat:2 }}</h3>
-                <small class="text-muted">Lucro estimado do estoque</small>
-            </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card shadow-sm border-0 rounded-3 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Lucro Estoque</span>
+          <i class="bi bi-bar-chart-line text-warning fs-4"></i>
         </div>
+        <h3 class="fw-bold text-warning">R$ {{ lucro_estoque|floatformat:2 }}</h3>
+        <small class="text-muted">Lucro estimado do estoque</small>
+      </div>
     </div>
+  </div>
+</div>
 
-    {% comment %} KPIs adicionais {% endcomment %}
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Produtos em Risco</span>
-                    <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-danger">{{ products_risk|default:0 }}</h3>
-                <small class="text-muted">Estoque menor que demanda</small>
-            </div>
-        </div>
+<!-- Gráficos -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-body">
+        <h5 class="card-title fw-bold mb-3">Tendência Mensal de Vendas</h5>
+        <canvas id="graficoVendasMensais" height="200"></canvas>
+      </div>
     </div>
+  </div>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Impacto Promoções</span>
-                    <i class="bi bi-percent text-info fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-info">{{ promo_impact|default:0 }}%</h3>
-                <small class="text-muted">Média de aumento nas vendas</small>
-            </div>
-        </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-body">
+        <h5 class="card-title fw-bold mb-3">Top 10 Produtos Mais Vendidos</h5>
+        <canvas id="graficoTopProdutos" height="200"></canvas>
+      </div>
     </div>
-
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Última Atualização</span>
-                    <i class="bi bi-clock-history text-secondary fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-secondary">{{ last_update|default:"-" }}</h3>
-                <small class="text-muted">Data da última atualização do sistema</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 rounded-3 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Crescimento Mensal</span>
-                    <i class="bi bi-arrow-up-right text-success fs-4"></i>
-                </div>
-                <h3 class="fw-bold text-success">{{ monthly_growth|default:0 }}%</h3>
-                <small class="text-muted">Comparado ao período anterior</small>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
 <!-- Tabela de Produtos com Maior Giro -->
 <div class="row g-4">
-    <div class="col-lg-12">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                <h5 class="card-title fw-bold mb-3">Produtos com Maior Giro</h5>
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light sticky-top">
-                        <tr>
-                            <th>Produto</th>
-                            <th>Qtd Vendida</th>
-                            <th>Estoque Atual</th>
-                            <th>Lucro Estimado</th>
-                            <th>Status Estoque</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for produto in top_produtos %}
-                        <tr class="{% if produto.qtd_vendida > produto.quantity %}table-danger{% endif %}">
-                            <td>{{ produto.title }}</td>
-                            <td>{{ produto.qtd_vendida|default:0 }}</td>
-                            <td>{{ produto.quantity }}</td>
-                            <td>R$ {{ produto.lucro_estimado|floatformat:2 }}</td>
-                            <td>
-                                {% if produto.qtd_vendida > produto.quantity %}
-                                    <span class="badge bg-danger">Baixo</span>
-                                {% else %}
-                                    <span class="badge bg-success">OK</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center">Nenhum produto encontrado.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <div class="col-lg-12">
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+        <h5 class="card-title fw-bold mb-3">Produtos com Maior Giro</h5>
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>Produto</th>
+              <th>Qtd Vendida</th>
+              <th>Estoque Atual</th>
+              <th>Lucro Estimado</th>
+              <th>Status Estoque</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produto in top_produtos %}
+            <tr class="{% if produto.qtd_vendida > produto.quantity %}table-danger{% endif %}">
+              <td>{{ produto.title }}</td>
+              <td>{{ produto.qtd_vendida|default:0 }}</td>
+              <td>{{ produto.quantity }}</td>
+              <td>R$ {{ produto.lucro_estimado|floatformat:2 }}</td>
+              <td>
+                {% if produto.qtd_vendida > produto.quantity %}
+                  <span class="badge bg-danger">Baixo</span>
+                {% else %}
+                  <span class="badge bg-success">OK</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">Nenhum produto encontrado.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labelsMeses = JSON.parse('{{ labels_meses|safe }}');
+const valoresVendas = JSON.parse('{{ valores_vendas|safe }}');
+const labelsProdutos = JSON.parse('{{ labels_produtos|safe }}');
+const valoresProdutos = JSON.parse('{{ valores_produtos|safe }}');
+
+// Detecta modo escuro do sistema
+const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = darkMode ? '#444' : '#ddd';
+const textColor = darkMode ? '#f8f9fa' : '#212529';
+
+// Gráfico 1: Vendas mensais
+new Chart(document.getElementById('graficoVendasMensais'), {
+  type: 'line',
+  data: {
+    labels: labelsMeses,
+    datasets: [{
+      label: 'Vendas',
+      data: valoresVendas,
+      borderWidth: 2,
+      borderColor: '#0d6efd',
+      backgroundColor: 'rgba(13,110,253,0.2)',
+      tension: 0.3,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: { 
+      y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+      x: { ticks: { color: textColor } }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
+
+// Gráfico 2: Top produtos
+new Chart(document.getElementById('graficoTopProdutos'), {
+  type: 'bar',
+  data: {
+    labels: labelsProdutos,
+    datasets: [{
+      label: 'Qtd Vendida',
+      data: valoresProdutos,
+      backgroundColor: 'rgba(25,135,84,0.7)'
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: { 
+      y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+      x: { ticks: { color: textColor } }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
+
+</script>
 {% endblock %}
