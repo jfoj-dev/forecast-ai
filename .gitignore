@@ -1,0 +1,16 @@
+# Arquivos compilados do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
+venv/
+.env/
+
+# Arquivos temporários
+*.log
+*.sqlite3
+
+# Configurações do sistema
+.DS_Store
+Thumbs.db
