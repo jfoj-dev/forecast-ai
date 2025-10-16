@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, F, Q, FloatField
 from django.db.models.functions import Coalesce, TruncMonth
 from datetime import datetime, timedelta
@@ -6,7 +7,7 @@ from products.models import Product
 from outflows.models import Outflow
 import json
 
-
+@login_required(login_url='login')
 def home(request):
     # --------------------------------------------
     # Filtro de período (Data Início e Fim)

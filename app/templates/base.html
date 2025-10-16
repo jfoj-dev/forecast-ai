@@ -24,7 +24,9 @@
   {% include 'components/_header.html' %}
 
   <div class="d-flex flex-grow-1">
-    {% include 'components/_sidebar.html' %}
+    {% if user.is_authenticated %}
+      {% include 'components/_sidebar.html' %}
+    {% endif %}
 
     <main class="flex-fill p-4 content-area">
       <div class="container mt-4">

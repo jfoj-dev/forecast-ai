@@ -5,9 +5,10 @@ from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from . import models, forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class CategoryListView(ListView):
+class CategoryListView(LoginRequiredMixin, ListView):
     model = models.Category
     template_name = 'category_list.html'
     context_object_name = 'categories'
@@ -21,26 +22,26 @@ class CategoryListView(ListView):
         return queryset
 
 
-class CategoryCreateView(CreateView):
+class CategoryCreateView(LoginRequiredMixin, CreateView):
     model = models.Category
     template_name = 'category_create.html'
     form_class = forms.CategoryForm
     success_url = reverse_lazy('category_list')
 
 
-class CategoryDetailView(DetailView):
+class CategoryDetailView(LoginRequiredMixin, DetailView):
     model = models.Category
     template_name = 'category_detail.html'
 
 
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Category
     template_name = 'category_update.html'
     form_class = forms.CategoryForm
     success_url = reverse_lazy('category_list')
 
 
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     model = models.Category
     template_name = 'category_delete.html'
     success_url = reverse_lazy('category_list')

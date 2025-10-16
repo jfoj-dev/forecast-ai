@@ -7,9 +7,10 @@ from .models import Product
 from categories.models import Category
 from brands.models import Brands
 from . import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # -------------------- LISTAGEM --------------------
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'product_list.html'
     context_object_name = 'products'
@@ -39,7 +40,7 @@ class ProductListView(ListView):
         return context
 
 # -------------------- CRIAÇÃO --------------------
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     template_name = 'product_create.html'
     form_class = forms.ProductForm
@@ -51,12 +52,12 @@ class ProductCreateView(CreateView):
         return super().form_valid(form)
 
 # -------------------- DETALHE --------------------
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = 'product_detail.html'
 
 # -------------------- ATUALIZAÇÃO --------------------
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
     template_name = 'product_update.html'
     form_class = forms.ProductForm
@@ -75,7 +76,7 @@ class ProductUpdateView(UpdateView):
             return super().form_valid(form)
 
 # -------------------- EXCLUSÃO --------------------
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
     model = Product
     template_name = 'product_delete.html'
     success_url = reverse_lazy('product_list')
@@ -97,7 +98,7 @@ class ProductDeleteView(DeleteView):
             return redirect(self.success_url)
 
 # -------------------- EXCLUSÃO EM MASSA --------------------
-class ProductBulkDeleteView(View):
+class ProductBulkDeleteView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         selected_ids = request.POST.getlist('selected_products')
         if not selected_ids:

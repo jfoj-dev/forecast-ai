@@ -6,9 +6,10 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from . import models, forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class BrandListView(ListView):
+class BrandListView(LoginRequiredMixin, ListView):
     model = models.Brands
     template_name = 'brand_list.html'
     context_object_name = 'brands'
@@ -22,26 +23,26 @@ class BrandListView(ListView):
         return queryset
 
 
-class BrandCreateView(CreateView):
+class BrandCreateView(LoginRequiredMixin, CreateView):
     model = models.Brands
     template_name = 'brand_create.html'
     form_class = forms.BrandForm
     success_url = reverse_lazy('brand_list')
 
 
-class BrandDetailView(DetailView):
+class BrandDetailView(LoginRequiredMixin, DetailView):
     model = models.Brands
     template_name = 'brand_detail.html'
 
 
-class BrandUpdateView(UpdateView):
+class BrandUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Brands
     template_name = 'brand_update.html'
     form_class = forms.BrandForm
     success_url = reverse_lazy('brand_list')
 
 
-class BrandDeleteView(DeleteView):
+class BrandDeleteView(LoginRequiredMixin, DeleteView):
     model = models.Brands
     template_name = 'brand_delete.html'
     success_url = reverse_lazy('brand_list')

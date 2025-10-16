@@ -11,12 +11,13 @@ import csv
 from .models import Forecast
 from outflows.models import Outflow
 from .forecast_pipeline import run_pipeline, train_forecast_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # -------------------------
 # LISTA DE PREVISÕES
 # -------------------------
-class ForecastListView(TemplateView):
+class ForecastListView(LoginRequiredMixin, TemplateView):
     template_name = "forecast_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -145,7 +146,7 @@ class ForecastListView(TemplateView):
 # -------------------------
 # GERAR PREVISÕES
 # -------------------------
-class GenerateForecastView(View):
+class GenerateForecastView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             result = run_pipeline()
@@ -157,7 +158,7 @@ class GenerateForecastView(View):
 # -------------------------
 # EXPORTAR CSV
 # -------------------------
-class ExportForecastCSVView(View):
+class ExportForecastCSVView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         start_date_str = request.GET.get('start_date')
         end_date_str = request.GET.get('end_date')
@@ -204,7 +205,7 @@ class ExportForecastCSVView(View):
 # TREINAR MODELO VIA AJAX
 # -------------------------
 @method_decorator(csrf_exempt, name='dispatch')
-class TrainModelView(View):
+class TrainModelView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             metrics = train_forecast_model()
