@@ -11,14 +11,15 @@ import csv
 from .models import Forecast
 from outflows.models import Outflow
 from .forecast_pipeline import run_pipeline, train_forecast_model
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 # -------------------------
 # LISTA DE PREVISÕES
 # -------------------------
-class ForecastListView(LoginRequiredMixin, TemplateView):
+class ForecastListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = "forecast_list.html"
+    permission_required = 'forecasts.view_forecast'
 
     def get(self, request, *args, **kwargs):
         # -------------------------
@@ -146,7 +147,7 @@ class ForecastListView(LoginRequiredMixin, TemplateView):
 # -------------------------
 # GERAR PREVISÕES
 # -------------------------
-class GenerateForecastView(LoginRequiredMixin, View):
+class GenerateForecastView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             result = run_pipeline()
@@ -158,7 +159,7 @@ class GenerateForecastView(LoginRequiredMixin, View):
 # -------------------------
 # EXPORTAR CSV
 # -------------------------
-class ExportForecastCSVView(LoginRequiredMixin,View):
+class ExportForecastCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         start_date_str = request.GET.get('start_date')
         end_date_str = request.GET.get('end_date')

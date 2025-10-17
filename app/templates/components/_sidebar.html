@@ -14,48 +14,75 @@
   <!-- Menu -->
   <div class="collapse d-sm-block" id="menuCollapse">
     <ul class="nav nav-pills flex-column mb-auto" id="menu">
+
+      <!-- Dashboard -->
       <li class="nav-item mb-1">
         <a href="{% url 'home' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
           {% if request.resolver_match.url_name == 'home' %}active bg-dark{% endif %}">
           <i class="bi bi-speedometer2 fs-5 me-2"></i> Dashboard
         </a>
       </li>
+
+      <!-- Cadastros (menu pai) -->
+      {% with current=request.resolver_match.url_name %}
       <li class="nav-item mb-1">
-        <a href="{% url 'supplier_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
-          {% if request.resolver_match.url_name == 'supplier_list' %}active bg-dark{% endif %}">
-          <i class="bi bi-truck fs-5 me-2"></i> Fornecedores
+        <a class="nav-link text-white d-flex align-items-center px-3 py-2 rounded {% if current in 'supplier_list category_list brand_list product_list' %}bg-dark{% endif %}"
+           data-bs-toggle="collapse" href="#submenuCadastros" role="button" 
+           aria-expanded="{% if current in 'supplier_list category_list brand_list product_list' %}true{% else %}false{% endif %}" 
+           aria-controls="submenuCadastros">
+          <i class="bi bi-folder-plus fs-5 me-2"></i> Cadastros
+          <i class="bi bi-chevron-down ms-auto"></i>
         </a>
+
+        <!-- Submenu Cadastros -->
+        <div class="collapse ps-3 {% if current in 'supplier_list category_list brand_list product_list' %}show{% endif %}" id="submenuCadastros" data-bs-parent="#menu">
+          <ul class="nav flex-column mt-1">
+            <li class="nav-item mb-1">
+              <a href="{% url 'supplier_list' %}" class="nav-link text-white px-3 py-2 rounded
+                {% if current == 'supplier_list' %}active bg-dark{% endif %}">
+                <i class="bi bi-truck me-2"></i> Fornecedores
+              </a>
+            </li>
+            <li class="nav-item mb-1">
+              <a href="{% url 'category_list' %}" class="nav-link text-white px-3 py-2 rounded
+                {% if current == 'category_list' %}active bg-dark{% endif %}">
+                <i class="bi bi-tags me-2"></i> Categorias
+              </a>
+            </li>
+            <li class="nav-item mb-1">
+              <a href="{% url 'brand_list' %}" class="nav-link text-white px-3 py-2 rounded
+                {% if current == 'brand_list' %}active bg-dark{% endif %}">
+                <i class="bi bi-shop me-2"></i> Marcas
+              </a>
+            </li>
+            <li class="nav-item mb-1">
+              <a href="{% url 'product_list' %}" class="nav-link text-white px-3 py-2 rounded
+                {% if current == 'product_list' %}active bg-dark{% endif %}">
+                <i class="bi bi-box-seam me-2"></i> Produtos
+              </a>
+            </li>
+          </ul>
+        </div>
       </li>
-      <li class="nav-item mb-1">
-        <a href="{% url 'brand_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
-          {% if request.resolver_match.url_name == 'brand_list' %}active bg-dark{% endif %}">
-          <i class="bi bi-shop fs-5 me-2"></i> Marcas
-        </a>
-      </li>
-      <li class="nav-item mb-1">
-        <a href="{% url 'category_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
-          {% if request.resolver_match.url_name == 'category_list' %}active bg-dark{% endif %}">
-          <i class="bi bi-tags fs-5 me-2"></i> Categorias
-        </a>
-      </li>
-      <li class="nav-item mb-1">
-        <a href="{% url 'product_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
-          {% if request.resolver_match.url_name == 'product_list' %}active bg-dark{% endif %}">
-          <i class="bi bi-box-seam fs-5 me-2"></i> Produtos
-        </a>
-      </li>
+      {% endwith %}
+
+      <!-- Entradas -->
       <li class="nav-item mb-1">
         <a href="{% url 'inflow_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
           {% if request.resolver_match.url_name == 'inflow_list' %}active bg-dark{% endif %}">
           <i class="bi bi-arrow-down-left-square fs-5 me-2"></i> Entradas
         </a>
       </li>
+
+      <!-- Saídas -->
       <li class="nav-item mb-1">
         <a href="{% url 'outflow_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
           {% if request.resolver_match.url_name == 'outflow_list' %}active bg-dark{% endif %}">
           <i class="bi bi-arrow-up-right-square fs-5 me-2"></i> Saídas
         </a>
       </li>
+
+      <!-- Previsões -->
       <li class="nav-item mb-1">
         <a href="{% url 'forecast_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
           {% if request.resolver_match.url_name == 'forecast_list' %}active bg-dark{% endif %}">

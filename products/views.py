@@ -7,14 +7,15 @@ from .models import Product
 from categories.models import Category
 from brands.models import Brands
 from . import forms
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 # -------------------- LISTAGEM --------------------
-class ProductListView(LoginRequiredMixin, ListView):
+class ProductListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Product
     template_name = 'product_list.html'
     context_object_name = 'products'
     paginate_by = 10
+    permission_required = 'products.view_product'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -40,11 +41,12 @@ class ProductListView(LoginRequiredMixin, ListView):
         return context
 
 # -------------------- CRIAÇÃO --------------------
-class ProductCreateView(LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Product
     template_name = 'product_create.html'
     form_class = forms.ProductForm
     success_url = reverse_lazy('product_list')
+    permission_required = 'products.add_product'
 
     def form_valid(self, form):
         # Ao criar, last_cost_price recebe o valor inicial de cost_price
@@ -52,16 +54,18 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 # -------------------- DETALHE --------------------
-class ProductDetailView(LoginRequiredMixin, DetailView):
+class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Product
     template_name = 'product_detail.html'
+    permission_required = 'products.view_product'
 
 # -------------------- ATUALIZAÇÃO --------------------
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
+class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Product
     template_name = 'product_update.html'
     form_class = forms.ProductForm
     success_url = reverse_lazy('product_list')
+    permission_required = 'products.add_product'
 
     def form_valid(self, form):
         # Se o checkbox update_cost estiver marcado
@@ -76,10 +80,11 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
             return super().form_valid(form)
 
 # -------------------- EXCLUSÃO --------------------
-class ProductDeleteView(LoginRequiredMixin, DeleteView):
+class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Product
     template_name = 'product_delete.html'
     success_url = reverse_lazy('product_list')
+    permission_required = 'productss.delete_product'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -98,7 +103,7 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
             return redirect(self.success_url)
 
 # -------------------- EXCLUSÃO EM MASSA --------------------
-class ProductBulkDeleteView(LoginRequiredMixin, View):
+class ProductBulkDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         selected_ids = request.POST.getlist('selected_products')
         if not selected_ids:
