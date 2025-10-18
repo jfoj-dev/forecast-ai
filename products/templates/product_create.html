@@ -11,10 +11,10 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Salvar Produto</button>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary mt-0">Cancelar</a>
       </form>
     </div>
   </div>
-<a href="{% url 'product_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para a Lista de Produtos</a>
 </div>
 
 {%endblock%}

@@ -11,10 +11,10 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Registrar Saída</button>
+        <a href="{% url 'outflow_list' %}" class="btn btn-secondary mt-0">Cancelar</a>
       </form>
     </div>
   </div>
-<a href="{% url 'outflow_list' %}" class="btn btn-secondary mt-3">Cancelar</a>
 </div>
 
 {%endblock%}

@@ -1,215 +1,117 @@
+/* ==================== SIDEBAR ==================== */
 .sidebar {
-  height: 100vh;          /* Altura total da tela */
-  width: 220px;           /* Largura da barra */
-  position: fixed;        /* Fixa na lateral */
-  top: 0;
-  left: 0;
-  background-color: #073549; /* Cor de fundo */
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar a {
-  padding: 15px 20px;
-  text-decoration: none;
-  font-size: 18px;
-  color: #f1f1f1;
-  display: block;
-  transition: 0.3s;
-}
-
-/* Efeito hover nos links */
-.sidebar a:hover {
-  background-color: #575757;
-  color: white;
-}
-
-/* Conteúdo principal */
-.content {
-  margin-left: 250px;    /* Espaço para a sidebar */
-  padding: 20px;
-}
-
-/* Container da logo */
-.sidebar .logo {
-    width: 100%;
-    display: flex;               /* ativa flexbox */
-    justify-content: center;     /* centraliza horizontalmente */
-    align-items: center;         /* centraliza verticalmente (se tiver altura definida) */
-    flex-direction: column;      /* mantém imagem e texto em coluna */
-    padding: 0;             /* espaçamento acima e abaixo */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Imagem da logo */
-.sidebar .logo img {
-    width: 220px;
-    height: auto;
-    border-radius: 10px; /* se quiser cantos arredondados */
-}
-
-/* Texto da logo */
-.sidebar .logo h5 {
-    margin-top: 10px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #ffffff;       /* branco para contraste no fundo escuro */
-}
-
-/* Hover opcional: aumenta ligeiramente a logo */
-.sidebar .logo img:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease-in-out;
-}
-
-/* Sidebar fixa */
-.sidebar {
-  width: 250px;      /* mesma largura da sidebar */
-  min-width: 250px;
-  height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;     /* garante que a sidebar fique sobre o conteúdo */
-}
-
-/* Conteúdo principal */
-.main-content {
-  margin-left: 250px; /* espaço reservado para a sidebar */
-  transition: margin-left 0.3s;
-  padding: 2rem;
-}
-
-/* Sidebar fixa */
-.sidebar {
-    min-width: 220px;
-    max-width: 220px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    overflow-y: auto;
-    padding-top: 60px; /* se tiver header fixo */
-    z-index: 1000;
-}
-
-/* Ajusta o conteúdo principal para não sobrepor a sidebar */
-.content-area {
-    margin-left: 220px; /* mesma largura da sidebar */
-    min-height: calc(100vh - 60px - 40px); /* altura total - header - footer */
-    transition: background-color 0.3s, color 0.3s;
-}
-
-/* Footer fixo na parte inferior */
-footer {
-    margin-top: auto;
-    padding: 1rem 0;
-    width: 100%;
-    text-align: center;
-}
-
-/* Dark Mode */
-body.dark-mode {
-    background-color: #121212;
-    color: #f0f0f0;
-}
-
-body.dark-mode .sidebar {
-    background-color: #1c1c1c !important;
-    color: #f0f0f0 !important;
-}
-
-body.dark-mode .content-area {
-    background-color: #181818;
-    color: #f0f0f0;
-}
-
-body.dark-mode footer {
-    background-color: #1c1c1c;
-    color: #f0f0f0;
-}
-
-/* Evita overflow horizontal */
-html, body {
-    overflow-x: hidden;
-}
-
-/* Container da paginação */
-.pagination-gray {
-  border-radius: 8px;          
-  overflow: hidden;
-  display: inline-flex;        
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-}
-
-/* Links da paginação */
-.pagination-gray .page-link {
-  background-color: #f5f5f5;   
-  color: #495057;               
-  border: none;                 
-  padding: 0.5rem 0.75rem;
-  transition: background 0.2s, color 0.2s;
-}
-
-/* Página ativa */
-.pagination-gray .page-item.active .page-link {
-  background-color: #6c757d;   
-  color: #fff;                  
-  font-weight: 500;
-}
-
-/* Hover */
-.pagination-gray .page-link:hover {
-  background-color: #dee2e6;   
-  color: #212529;
-}
-
-/* Pequeno espaçamento entre itens */
-.pagination-gray .page-item:not(:last-child) .page-link {
-  margin-right: 2px;
-  
-}
-
-/* ===== Body e tema ===== */
-body {
-  min-height: 100vh;
+  width: 220px;
+  height: 100vh;
+  background-color: #073549;
   display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 1000;
+  padding-top: 60px; /* se tiver header fixo */
+  transition: background-color 0.3s, color 0.3s, left 0.3s;
+}
+
+/* Logo da sidebar */
+.sidebar .logo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  transition: background 0.3s ease, color 0.3s ease;
-  overflow-x: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 0;
 }
 
-body.light-mode {
-  background: linear-gradient(135deg, #147796, #073549);
-  color: #333;
+.sidebar .logo img {
+  width: 180px;
+  height: auto;
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
 }
 
-body.dark-mode {
-  background: linear-gradient(135deg, #232526, #414345);
-  color: #fff; /* fonte branca no dark mode */
+.sidebar .logo img:hover {
+  transform: scale(1.05);
 }
 
-/* ===== Card ===== */
+.sidebar .logo h5 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Links da sidebar */
+.sidebar a {
+  padding: 14px 20px;
+  text-decoration: none;
+  font-size: 16px;
+  color: #f1f1f1;
+  display: block;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background-color: #575757;
+  color: #fff;
+}
+
+
+
+/* ==================== CONTEÚDO DAS APPS ==================== */
+.app-content {
+  margin-left: 220px; /* espaço da sidebar */
+  padding: 40px;
+  width: calc(100% - 220px);
+  min-height: calc(100vh - 60px - 40px);
+  display: flex;
+  justify-content: center;
+  transition: margin-left 0.3s;
+}
+
+.app-content .container {
+  width: 100%;
+  max-width: 1400px; /* largura máxima do conteúdo */
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  padding: 30px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ==================== LOGIN ==================== */
+.content-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;     
+  height: 100vh;       /* garante que a altura seja exatamente a da tela */
+  width: 100%;
+  padding: 0;
+  background-color: #073549;
+  overflow: hidden;    /* previne scroll */
+}
+
 .login-card {
   border-radius: 20px;
-  background-color: #fff;
-  width: 90%;
-  max-width: 500px; /* card maior */
+  background-color: #e7eef0;
+  width: 100%;
+  max-width: 500px;
   padding: 3rem 2.5rem;
   box-shadow: 0 15px 50px rgba(0,0,0,0.25);
   opacity: 0;
   transform: translateY(-50px);
   animation: slideFadeIn 0.6s forwards;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
-  color: inherit; /* herda cor do body */
+  color: #000000;
 }
 
 body.dark-mode .login-card {
   background-color: #2c2c2c;
-  color: #fff; /* fonte branca no dark mode */
+  color: #fff;
 }
 
 .login-card:hover {
@@ -224,35 +126,13 @@ body.dark-mode .login-card {
   }
 }
 
-/* ===== Logo ===== */
 .login-logo {
   display: block;
   margin: 0 auto 1.5rem auto;
   max-width: 180px;
 }
 
-/* ===== Título e subtítulo ===== */
-.login-card h5 {
-  font-weight: 700;
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  text-align: center;
-  color: inherit;
-}
-
-.login-card p.subtitle {
-  text-align: center;
-  color: #666;
-  margin-bottom: 2.5rem;
-  font-size: 1rem;
-  transition: color 0.3s ease;
-}
-
-body.dark-mode .login-card p.subtitle {
-  color: #fff;
-}
-
-/* ===== Inputs com ícones ===== */
+/* ==================== FORMULÁRIOS ==================== */
 .form-group {
   position: relative;
   margin-bottom: 1.8rem;
@@ -294,7 +174,7 @@ body.dark-mode .form-control {
   border: 1px solid #555;
 }
 
-/* ===== Botão ===== */
+/* ==================== BOTÕES ==================== */
 .btn-login {
   background: linear-gradient(135deg, #ff8400, #ff8400);
   border: none;
@@ -312,69 +192,54 @@ body.dark-mode .form-control {
   box-shadow: 0 10px 30px rgba(78,84,200,0.45);
 }
 
-/* ===== Alertas ===== */
-.alert {
-  border-radius: 12px;
-  font-size: 0.9rem;
-  margin-top: 1rem;
+/* ==================== DARK MODE ==================== */
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
 }
 
-/* ===== Tema toggle ===== */
-.theme-toggle {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  background: rgba(255,255,255,0.85);
-  padding: 6px 12px;
-  border-radius: 12px;
-  transition: background 0.3s ease, color 0.3s ease;
-  z-index: 10;
+body.dark-mode .sidebar {
+  background-color: #1c1c1c;
 }
 
-body.dark-mode .theme-toggle {
-  background: rgba(0,0,0,0.6);
-  color: #fff;
+body.dark-mode .app-content,
+body.dark-mode .app-content .container {
+  background-color: #181818;
+  color: #f0f0f0;
 }
 
-/* ===== Responsividade ===== */
+body.dark-mode .content-area {
+  background-color: #181818;
+  color: #f0f0f0;
+}
+
+body.dark-mode footer {
+  background-color: #1c1c1c;
+  color: #f0f0f0;
+}
+
+/* ==================== RESPONSIVIDADE ==================== */
 @media (max-width: 992px) {
-  .login-card {
-    max-width: 450px;
-    padding: 2.5rem 2rem;
+  .sidebar {
+    width: 200px;
+  }
+  .app-content {
+    margin-left: 200px;
+    padding: 30px 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .login-card {
-    width: 95%;
-    padding: 2rem 1.5rem;
+  .sidebar {
+    left: -220px;
   }
 
-  .form-control {
-    height: 45px;
-    font-size: 0.95rem;
+  .sidebar.active {
+    left: 0;
   }
 
-  .btn-login {
-    height: 45px;
-    font-size: 1rem;
-  }
-
-  .login-logo {
-    max-width: 150px;
+  .app-content {
+    margin-left: 0;
+    padding: 20px;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

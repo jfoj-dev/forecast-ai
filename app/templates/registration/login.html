@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Login{% endblock %}
 
 {% block content %}
-{% load static %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
-<div class="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</div>
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
   <div class="card login-card">
@@ -13,8 +13,10 @@
       <!-- Logo Forecast AI -->
       <img src="{% static 'app/images/preve_logo_dark.png' %}" alt="Forecast AI Logo" class="login-logo">
 
-      <h5>Bem-vindo</h5>
-      <p class="subtitle">Entre na sua conta para continuar</p>
+      <div class="text-center">
+        <h5>Bem-vindo</h5>
+        <p class="subtitle">Entre na sua conta para continuar</p>
+      </div>
 
       <form method="post">
         {% csrf_token %}
