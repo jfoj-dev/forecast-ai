@@ -1,3 +1,4 @@
+from rest_framework import generics
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -6,7 +7,7 @@ from django.shortcuts import redirect
 from .models import Product
 from categories.models import Category
 from brands.models import Brands
-from . import forms
+from . import forms, models, serializers
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 # -------------------- LISTAGEM --------------------
@@ -101,6 +102,15 @@ class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
                 f'Não é possível excluir o produto "{self.object.title}" pois está vinculado a algum registro.'
             )
             return redirect(self.success_url)
+        
+class ProductCreateListAPIView(generics.ListCreateAPIView):
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.ProductSerializer
+
+
+class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.ProductSerializer
 
 # -------------------- EXCLUSÃO EM MASSA --------------------
 class ProductBulkDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):

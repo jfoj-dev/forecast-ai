@@ -16,11 +16,14 @@
             </div>
         </form>
     </div>
+
+    {% if perms.brands.add_brand %}
     <div class="col-md-6 text-end">
         <a href="{% url 'brand_create' %}" class="btn btn-success">
             <i class="bi bi-plus-lg"></i> Incluir
         </a>
     </div>
+    {% endif %}
 </div>
 
 <form id="bulk-delete-form" method="post" action="{% url 'brand_bulk_delete' %}">

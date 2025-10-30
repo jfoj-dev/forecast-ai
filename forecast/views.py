@@ -147,7 +147,7 @@ class ForecastListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView
 # -------------------------
 # GERAR PREVISÕES
 # -------------------------
-class GenerateForecastView(LoginRequiredMixin, PermissionRequiredMixin, View):
+class GenerateForecastView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             result = run_pipeline()
@@ -159,7 +159,7 @@ class GenerateForecastView(LoginRequiredMixin, PermissionRequiredMixin, View):
 # -------------------------
 # EXPORTAR CSV
 # -------------------------
-class ExportForecastCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
+class ExportForecastCSVView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         start_date_str = request.GET.get('start_date')
         end_date_str = request.GET.get('end_date')

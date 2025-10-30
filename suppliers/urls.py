@@ -10,4 +10,7 @@ urlpatterns = [
 
     # Rota para exclusão em massa
     path('suppliers/bulk-delete/', views.supplier_bulk_delete, name='supplier_bulk_delete'),
+
+    path('api/v1/suppliers/', views.SupplierCreateListAPIView.as_view(), name='supplier-create-list-api-view'),
+    path('api/v1/suppliers/<int:pk>/', views.SupplierRetrieveUpdateDestroyAPIView.as_view(), name='supplier-detail-api-view')
 ]

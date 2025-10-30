@@ -1,10 +1,11 @@
+from rest_framework import generics
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
-from . import models, forms
+from . import models, forms, serializers
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
@@ -68,6 +69,15 @@ class SupplierDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
                 f'Não é possível excluir o fornecedor "{self.object.name}" pois ele está sendo utilizado em um evento.'
             )
             return redirect(self.success_url)
+        
+class SupplierCreateListAPIView(generics.ListCreateAPIView):
+    queryset = models.Supplier.objects.all()
+    serializer_class = serializers.SupplierSerializer
+
+
+class SupplierRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Supplier.objects.all()
+    serializer_class = serializers.SupplierSerializer
 
 
 # ===============================================

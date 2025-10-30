@@ -1,10 +1,11 @@
+from rest_framework import generics
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
-from . import models, forms
+from . import models, forms, serializers
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
@@ -67,6 +68,14 @@ class CategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
             )
             return redirect(self.success_url)
 
+class CategoryCreateListAPIView(generics.ListCreateAPIView):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.CategorySerializer
+
+
+class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.CategorySerializer
 
 # Exclusão em massa de categorias
 @require_POST

@@ -1,3 +1,4 @@
+from rest_framework import generics
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -5,7 +6,7 @@ from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
-from . import models, forms
+from . import models, forms, serializers
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
@@ -67,6 +68,16 @@ class BrandDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
                 f'Não é possível excluir a marca "{self.object.name}" pois ela está vinculada a um evento/produto.'
             )
             return redirect(self.success_url)
+
+class BrandCreateListAPIView(generics.ListCreateAPIView):
+    queryset = models.Brands.objects.all()
+    serializer_class = serializers.BrandSerializer
+
+
+class BrandRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Brands.objects.all()
+    serializer_class = serializers.BrandSerializer
+
 
 
 # Função para exclusão em massa de marcas
