@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-teal">Configurações do Sistema</h3>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-3">
+        <div class="card-header bg-teal-700 fw-semibold">
+          <i class="bi bi-graph-up me-2"></i> Parâmetros de Previsão
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'config_list' %}">
+            {% csrf_token %}
+
+            <!-- Data Inicial -->
+            <div class="mb-3">
+              <label for="startDate" class="form-label">Data Inicial</label>
+              <input type="date" id="startDate" name="start_date" class="form-control" 
+                     value="{{ config.start_date|date:'Y-m-d' }}" required />
+              <small class="text-muted">Data base para início das previsões.</small>
+            </div>
+
+            <!-- Frequência -->
+            <div class="mb-3">
+              <label for="frequencia">Frequência</label>
+              <select id="frequencia" name="frequencia" class="form-select">
+                <option value="diaria" {% if config.frequencia == 'diaria' %}selected{% endif %}>Diária</option>
+                <option value="semanal" {% if config.frequencia == 'semanal' %}selected{% endif %}>Semanal</option>
+                <option value="mensal" {% if config.frequencia == 'mensal' %}selected{% endif %}>Mensal</option>
+              </select>
+            </div>
+
+            <!-- Dia da Semana -->
+            <div class="mb-3 d-none" id="dias-semana">
+              <label for="dias">Dia da semana</label>
+              <select id="dias" name="dia_semana" class="form-select">
+                <option value="segunda" {% if config.dia_semana == 'segunda' %}selected{% endif %}>Segunda</option>
+                <option value="terca" {% if config.dia_semana == 'terca' %}selected{% endif %}>Terça</option>
+                <option value="quarta" {% if config.dia_semana == 'quarta' %}selected{% endif %}>Quarta</option>
+                <option value="quinta" {% if config.dia_semana == 'quinta' %}selected{% endif %}>Quinta</option>
+                <option value="sexta" {% if config.dia_semana == 'sexta' %}selected{% endif %}>Sexta</option>
+                <option value="sabado" {% if config.dia_semana == 'sabado' %}selected{% endif %}>Sábado</option>
+                <option value="domingo" {% if config.dia_semana == 'domingo' %}selected{% endif %}>Domingo</option>
+              </select>
+            </div>
+
+            <!-- Dia do Mês -->
+            <div class="mb-3 d-none" id="dia-mes">
+              <label for="data-mes">Dia do mês</label>
+              <input type="number" id="data-mes" name="dia_mes" class="form-control" min="1" max="31"
+                     value="{{ config.dia_mes|default:'' }}">
+            </div>
+
+            <!-- Horizonte de Previsão -->
+            <div class="mb-3">
+              <label for="forecastHorizon" class="form-label">Horizonte (dias)</label>
+              <input type="number" id="forecastHorizon" name="forecast_horizon" class="form-control" 
+                     value="{{ config.forecast_horizon|default:30 }}" />
+            </div>
+
+            <!-- Considerar Promoções -->
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="includePromotions" name="include_promotions"
+                     {% if config.include_promotions %}checked{% endif %}>
+              <label class="form-check-label" for="includePromotions">Considerar promoções</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">
+              <i class="bi bi-save me-2"></i>Salvar Alterações
+            </button>
+          </form>
+
+          <!-- Script para mostrar/esconder campos -->
+          <script>
+            const frequencia = document.getElementById('frequencia');
+            const diasSemana = document.getElementById('dias-semana');
+            const diaMes = document.getElementById('dia-mes');
+
+            function atualizarCampos() {
+              const valor = frequencia.value;
+              if (valor === 'semanal') {
+                diasSemana.classList.remove('d-none');
+                diaMes.classList.add('d-none');
+              } else if (valor === 'mensal') {
+                diaMes.classList.remove('d-none');
+                diasSemana.classList.add('d-none');
+              } else {
+                diasSemana.classList.add('d-none');
+                diaMes.classList.add('d-none');
+              }
+            }
+
+            atualizarCampos();
+            frequencia.addEventListener('change', atualizarCampos);
+          </script>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

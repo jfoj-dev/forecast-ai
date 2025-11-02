@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'outflows',
     'forecast',
     'app',
+    'configs',
     
 ]
 

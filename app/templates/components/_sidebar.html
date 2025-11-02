@@ -99,6 +99,12 @@
       </a>
     </li>
     {% endif %} 
+    <li class="nav-item mb-1">
+      <a href="{% url 'config_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
+        {% if request.resolver_match.url_name == 'config_list' %}active bg-dark{% endif %}">
+        <i class="bi bi-gear fs-5 me-2"></i> Configurações
+      </a>
+    </li>
   </ul>
 
 <!-- Usuário logado próximo do hr -->

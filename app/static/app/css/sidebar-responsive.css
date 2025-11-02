@@ -1,0 +1,32 @@
+/* ==================== MENU MOBILE ==================== */
+@media (max-width: 576px) {
+  .sidebar {
+    left: -220px;
+    transition: left 0.3s ease;
+    z-index: 1030;
+  }
+
+  .sidebar.show {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1025;
+  }
+
+  .sidebar-overlay.show {
+    display: block;
+  }
+
+  .app-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    transition: margin-left 0.3s ease;
+  }
+}

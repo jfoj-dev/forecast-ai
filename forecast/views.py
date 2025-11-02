@@ -11,6 +11,7 @@ import csv
 from .models import Forecast
 from outflows.models import Outflow
 from .forecast_pipeline import run_pipeline, train_forecast_model
+from configs.models import ForecastConfig
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
@@ -150,11 +151,15 @@ class ForecastListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView
 class GenerateForecastView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
-            result = run_pipeline()
+            # Pega a última configuração
+            config = ForecastConfig.objects.order_by('-created_at').first()
+            if not config:
+                return JsonResponse({"success": False, "error": "Nenhuma configuração encontrada."})
+
+            result = run_pipeline(config)
             return JsonResponse({"success": True, "message": f"{result} previsões geradas com sucesso!"})
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
-
 
 # -------------------------
 # EXPORTAR CSV

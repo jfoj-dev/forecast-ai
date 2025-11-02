@@ -218,28 +218,5 @@ body.dark-mode footer {
   color: #f0f0f0;
 }
 
-/* ==================== RESPONSIVIDADE ==================== */
-@media (max-width: 992px) {
-  .sidebar {
-    width: 200px;
-  }
-  .app-content {
-    margin-left: 200px;
-    padding: 30px 20px;
-  }
-}
 
-@media (max-width: 768px) {
-  .sidebar {
-    left: -220px;
-  }
 
-  .sidebar.active {
-    left: 0;
-  }
-
-  .app-content {
-    margin-left: 0;
-    padding: 20px;
-  }
-}

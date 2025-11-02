@@ -22,4 +22,5 @@ urlpatterns = [
     path('outflows/', include('outflows.urls')),
     path('products/', include('products.urls')),
     path('forecast/', include('forecast.urls')),
+    path('configs/', include('configs.urls')),
 ]
