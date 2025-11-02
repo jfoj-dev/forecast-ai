@@ -19,7 +19,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 # -------------------------
 class ForecastListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = "forecast_list.html"
-    permission_required = 'forecasts.view_forecast'
+    permission_required = 'forecast.view_forecast'
 
     def get(self, request, *args, **kwargs):
         # -------------------------

@@ -18,11 +18,13 @@ SGE - Categorias
             </div>
         </form>
     </div>
+    {% if perms.categories.add_category %}
     <div class="col-md-6 text-end">
         <a href="{% url 'category_create' %}" class="btn btn-success">
             <i class="bi bi-plus-lg"></i> Nova Categoria
         </a>
     </div>
+    {% endif %}
 </div>
 
 <form id="bulk-delete-form" method="post" action="{% url 'category_bulk_delete' %}">
@@ -47,11 +49,13 @@ SGE - Categorias
                     <td>{{ category.id }}</td>
                     <td>{{ category.name }}</td>
                     <td>{{ category.description }}</td>
+                    {% if perms.categories.change_category %}
                     <td class="text-center">
                         <a href="{% url 'category_update' category.id %}" class="btn btn-warning btn-sm me-1" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
@@ -61,13 +65,14 @@ SGE - Categorias
             </tbody>
         </table>
     </div>
-
+    {% if perms.categories.delete_category %}
     <div class="d-flex justify-content-end mt-2">
         <!-- Botão abre modal de confirmação -->
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmBulkDeleteModal">
             <i class="bi bi-trash"></i> Excluir selecionadas
         </button>
     </div>
+    {% endif %}
 </form>
 
 {% include 'components/_pagination.html' %}

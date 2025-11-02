@@ -17,7 +17,7 @@
         </form>
     </div>
 
-    {% if perms.brands.add_brand %}
+    {% if perms.brands.add_brands %}
     <div class="col-md-6 text-end">
         <a href="{% url 'brand_create' %}" class="btn btn-success">
             <i class="bi bi-plus-lg"></i> Incluir
@@ -48,11 +48,13 @@
                     <td>{{ brand.id }}</td>
                     <td>{{ brand.name }}</td>
                     <td>{{ brand.description }}</td>
+                    {% if perms.brands.change_brands %}                 
                     <td class="text-center">
                         <a href="{% url 'brand_update' brand.id %}" class="btn btn-warning btn-sm me-1" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
@@ -62,13 +64,14 @@
             </tbody>
         </table>
     </div>
-
+    {% if perms.brands.delete_brands %}
     <div class="d-flex justify-content-end mt-2">
         <!-- Botão abre modal de confirmação -->
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmBulkDeleteModal">
             <i class="bi bi-trash"></i> Excluir selecionados
         </button>
     </div>
+    {% endif %}
 </form>
 
 {% include 'components/_pagination.html' %}

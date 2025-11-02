@@ -18,11 +18,13 @@ SGE - Marcas
             </div>
         </form>
     </div>
+    {% if perms.suppliers.add_supplier %}
     <div class="col-md-6 text-end">
         <a href="{% url 'supplier_create' %}" class="btn btn-success">
             <i class="bi bi-plus-lg"></i> Incluir
         </a>
     </div>
+    {% endif %}
 </div>
 
 <form id="bulk-delete-form" method="post" action="{% url 'supplier_bulk_delete' %}">
@@ -47,11 +49,13 @@ SGE - Marcas
                     <td>{{ supplier.id }}</td>
                     <td>{{ supplier.name }}</td>
                     <td>{{ supplier.description }}</td>
+                    {% if perms.suppliers.change_supplier %}
                     <td class="text-center">
                         <a href="{% url 'supplier_update' supplier.id %}" class="btn btn-warning btn-sm me-1" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
@@ -61,13 +65,14 @@ SGE - Marcas
             </tbody>
         </table>
     </div>
-
+    {% if perms.suppliers.delete_supplier %}
     <div class="d-flex justify-content-end mt-2">
         <!-- Botão abre modal de confirmação -->
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmBulkDeleteModal">
             <i class="bi bi-trash"></i> Excluir selecionados
         </button>
     </div>
+    {% endif %}
 </form>
 
 {% include 'components/_pagination.html' %}

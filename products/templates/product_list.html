@@ -19,11 +19,13 @@ SGE - Produtos
             </div>
         </form>
     </div>
+    {% if perms.products.add_product %}
     <div class="col-md-6 text-end">
         <a href="{% url 'product_create' %}" class="btn btn-success">
             <i class="bi bi-plus-lg"></i> Incluir
         </a>
     </div>
+    {% endif %}
 </div>
 
 <div class="row mb-3">
@@ -84,11 +86,13 @@ SGE - Produtos
                     <td>{{ product.selling_price }}</td>
                     <td>{{ product.serie_number }}</td>
                     <td>{{ product.quantity }}</td>
+                    {% if perms.products.change_product %}
                     <td class="text-center">
                         <a href="{% url 'product_update' product.id %}" class="btn btn-warning btn-sm me-1" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
@@ -98,13 +102,14 @@ SGE - Produtos
             </tbody>
         </table>
     </div>
-
+    {% if perms.products.delete_product %}
     <div class="d-flex justify-content-end mt-2">
         <!-- Botão abre modal de confirmação -->
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmBulkDeleteModal">
             <i class="bi bi-trash"></i> Excluir selecionados
         </button>
     </div>
+    {% endif %}
 </form>
 
 {% include 'components/_pagination.html' %}

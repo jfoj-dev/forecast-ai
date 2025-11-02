@@ -36,58 +36,69 @@
       <!-- Submenu Cadastros -->
       <div class="collapse ps-3 {% if current in 'supplier_list category_list brand_list product_list' %}show{% endif %}" id="submenuCadastros" data-bs-parent="#menu">
         <ul class="nav flex-column mt-1">
+          {% if perms.suppliers.view_supplier %} 
           <li class="nav-item mb-1">
             <a href="{% url 'supplier_list' %}" class="nav-link text-white px-3 py-2 rounded
               {% if current == 'supplier_list' %}active bg-dark{% endif %}">
               <i class="bi bi-truck me-2"></i> Fornecedores
             </a>
           </li>
+          {% endif %} 
+          {% if perms.categories.view_category %} 
           <li class="nav-item mb-1">
             <a href="{% url 'category_list' %}" class="nav-link text-white px-3 py-2 rounded
               {% if current == 'category_list' %}active bg-dark{% endif %}">
               <i class="bi bi-tags me-2"></i> Categorias
             </a>
+          {% endif %} 
           </li>
+          {% if perms.brands.view_brands %}
           <li class="nav-item mb-1">
             <a href="{% url 'brand_list' %}" class="nav-link text-white px-3 py-2 rounded
               {% if current == 'brand_list' %}active bg-dark{% endif %}">
               <i class="bi bi-shop me-2"></i> Marcas
             </a>
           </li>
+          {% endif %}
+          {% if perms.products.view_product %}
           <li class="nav-item mb-1">
             <a href="{% url 'product_list' %}" class="nav-link text-white px-3 py-2 rounded
               {% if current == 'product_list' %}active bg-dark{% endif %}">
               <i class="bi bi-box-seam me-2"></i> Produtos
             </a>
           </li>
+          {% endif %}
         </ul>
       </div>
     </li>
     {% endwith %}
-
     <!-- Entradas -->
+    {% if perms.outflows.view_outflow %}    
     <li class="nav-item mb-1">
       <a href="{% url 'inflow_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
         {% if request.resolver_match.url_name == 'inflow_list' %}active bg-dark{% endif %}">
         <i class="bi bi-arrow-down-left-square fs-5 me-2"></i> Entradas
       </a>
     </li>
-
+    {% endif %}
     <!-- Saídas -->
+     {% if perms.inflows.view_inflow %}
     <li class="nav-item mb-1">
       <a href="{% url 'outflow_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
         {% if request.resolver_match.url_name == 'outflow_list' %}active bg-dark{% endif %}">
         <i class="bi bi-arrow-up-right-square fs-5 me-2"></i> Saídas
       </a>
     </li>
-
+    {% endif %} 
     <!-- Previsões -->
+     {% if perms.forecast.view_forecast %} 
     <li class="nav-item mb-1">
       <a href="{% url 'forecast_list' %}" class="nav-link text-white d-flex align-items-center px-3 py-2 rounded
         {% if request.resolver_match.url_name == 'forecast_list' %}active bg-dark{% endif %}">
         <i class="bi bi-graph-up fs-5 me-2"></i> Previsões
       </a>
     </li>
+    {% endif %} 
   </ul>
 
 <!-- Usuário logado próximo do hr -->
