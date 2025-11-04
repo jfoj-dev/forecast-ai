@@ -99,7 +99,35 @@
             atualizarCampos();
             frequencia.addEventListener('change', atualizarCampos);
           </script>
-
+          
+        </div>
+      </div>
+    </div>
+    <!-- Card: Exibição e Layout -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-3">
+        <div class="card-header bg-teal-700 fw-semibold">
+          <i class="bi bi-layout-text-sidebar-reverse me-2"></i> Dados
+        </div>
+        <div class="card-body">
+          <form>            
+           <div class="mb-3">
+              <label for="importFile" class="form-label">Importação de Dados</label>
+              <div class="input-group">
+                <input type="file" class="form-control" id="importFile" name="import_file" aria-describedby="importHelp">
+                <button class="btn btn-primary" type="button">Importar</button>
+              </div>
+              <small id="importHelp" class="form-text text-muted">
+                Envie um arquivo CSV ou Excel com os dados históricos de vendas.
+              </small>
+            </div> 
+            
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-outline-secondary">
+                🔄 Conciliar Dados
+              </button>
+            </div>            
+          </form>
         </div>
       </div>
     </div>
